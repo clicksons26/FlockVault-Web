@@ -1,0 +1,846 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FlockVault | Click & Sons</title><style>
+:root{font-family:system-ui,Arial,sans-serif;color:#243329;background:#f3f2eb}*{box-sizing:border-box}body{margin:0}header{background:#294b39;color:white;padding:20px max(20px,calc((100vw - 1050px)/2))}header h1{margin:0;font-size:29px}header p{margin:4px 0 0;color:#dce7d9}main{max-width:1050px;margin:24px auto;padding:0 16px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;font-weight:650;background:#dce6d9;color:#254631}button.active,button.primary{background:#294b39;color:white}.panel{background:white;border:1px solid #e0e5dd;border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:0 3px 12px #263a2b0b}h2{margin-top:0}label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}input,select,textarea{font:inherit;width:100%;border:1px solid #bbcbbd;border-radius:8px;padding:10px;background:white}textarea{min-height:75px}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 14px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.stat{background:#e8efe5;border-radius:12px;padding:18px}.stat strong{display:block;font-size:30px;color:#294b39}.muted{color:#68736c;font-size:14px}.item{padding:12px 0;border-bottom:1px solid #e5e9e4}.item:last-child{border:0}.item strong{display:block}.item small{color:#617065}.danger{background:#f8e2de;color:#872b22} .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hidden{display:none!important}footer{text-align:center;color:#64736a;font-size:13px;padding:20px}@media(max-width:500px){header{padding:18px}h1{font-size:24px}.panel{padding:16px}}
+.tag{display:inline-block;border-radius:20px;background:#e8efe5;padding:3px 10px;font-size:12px}.warning{color:#8c4d10}.history{border-left:3px solid #a1b8a3;padding:8px 12px;margin:8px 0}.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.profile-grid>div{background:#f3f7f0;border-radius:10px;padding:12px}.profile-grid strong{display:block}
+.ops-toggle{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.ops-toggle button.selected{background:#294b39;color:white}.ops-group{border:1px solid #d4dfd2;border-radius:12px;margin:14px 0;padding:14px;background:#fbfcfa}.ops-group h3{margin:0 0 8px}.ops-task{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #e4e9e0;padding:10px 0;flex-wrap:wrap}.ops-task small{display:block;color:#5d6a60;margin-top:4px}.ops-empty{color:#607063;padding:10px 0}.ops-count{font-size:14px;color:#546758}.ops-quick{background:#edf3eb;padding:14px;border-radius:12px;margin:14px 0}
+
+/* Phase 10: touch-friendly phone layout; existing records/storage remain unchanged. */
+.mobile-tools{display:none}
+.mobile-jump{display:flex;align-items:center;gap:10px}
+.mobile-jump label{margin:0;white-space:nowrap;color:#294b39}
+.mobile-jump select{min-width:0;flex:1}
+.mobile-shortcuts{display:flex;gap:8px;margin-top:9px}
+.mobile-shortcuts button{flex:1;min-height:44px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #86a98c;outline-offset:2px}
+.mobile-notice{background:#fff8e9;border:1px solid #e7d4a5;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px}
+@media(max-width:700px){
+ header{padding:16px}
+ header h1{font-size:25px}
+ main{margin:12px auto;padding:0 12px}
+ .mobile-tools{display:block;position:sticky;top:0;z-index:20;background:#f3f2eb;padding:9px 0 12px;border-bottom:1px solid #d8e1d7;margin-bottom:14px}
+ nav.tabs{display:none}
+ .panel{padding:15px;border-radius:12px}
+ .fields{grid-template-columns:minmax(0,1fr)}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stat{padding:12px;min-width:0}
+ .stat strong{font-size:24px}
+ button{min-height:44px}
+ input,select,textarea{font-size:16px;min-height:44px}
+ textarea{min-height:85px}
+ .ops-task{align-items:stretch}
+ .ops-task button{width:100%}
+ .ops-toggle button{flex:1}
+ .actions button{flex:1}
+ .item{overflow-wrap:anywhere}
+}
+@media(min-width:701px){.mobile-notice{display:none}}
+
+/* Phase 29 phone usability improvements */
+.mobile-bottom-nav{display:none}
+.mobile-tools .mobile-shortcuts{overflow-x:auto;scrollbar-width:thin}
+.mobile-tools .mobile-shortcuts button{white-space:nowrap}
+@media(max-width:700px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+ .mobile-tools{top:0}
+ .mobile-bottom-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:fixed;bottom:0;left:0;right:0;z-index:60;background:#fff;border-top:1px solid #d3dfd2;padding:7px 5px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -4px 18px #263a2b1c}
+ .mobile-bottom-nav button{background:transparent;color:#294b39;padding:5px 2px;min-width:0;min-height:48px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;line-height:1.15}
+ .mobile-bottom-nav button span{font-size:20px}
+ .mobile-bottom-nav button.active{background:#e8efe5;color:#254631}
+ .mobile-bottom-nav button:focus-visible{outline-offset:-2px}
+ .panel,.item,.stat{max-width:100%;min-width:0}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}
+ .actions button{min-width:0;overflow-wrap:anywhere}
+ .fields>*{min-width:0}
+ .mobile-jump select{max-width:100%}
+ input[type=checkbox],input[type=radio]{width:auto;min-height:0;accent-color:#294b39}
+ table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
+@media(max-width:370px){.stats{grid-template-columns:minmax(0,1fr)}}
+</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#254b36"><link rel="apple-touch-icon" href="./icons/icon-192.png"></head><body><header><h1>🐓 FlockVault</h1><p>Click & Sons, LLC · Built On Feathers & Family</p></header><main><section class="panel" id="p30InstallGuide" style="margin:1rem 0"><h2>📱 Phase 30 · Install FlockVault</h2><p id="p30InstallStatus" role="status">Checking whether this version can be installed…</p><button id="p30InstallButton" type="button" style="display:none">Install FlockVault</button><p><strong>Android Chrome:</strong> Once FlockVault is opened from its secure HTTPS address, use Chrome's ⋮ menu and choose <em>Install app</em> or <em>Add to Home screen</em>.</p><p><strong>Windows Edge:</strong> Open the HTTPS address, then use ⋯ → Apps → Install this site as an app (if offered).</p><p><strong>Important:</strong> Opening index.html from Files or a content:// address does not provide a reliable installable app. Keep your JSON backups; installing does not sync your phone and computer.</p></section><div class="mobile-tools"><div class="mobile-jump"><label for="mobileSection">Go to</label><select id="mobileSection" aria-label="Choose FlockVault section"></select></div><div class="mobile-shortcuts"><button type="button" data-mobile-go="operations">🌿 Chores</button><button type="button" data-mobile-go="calendar">🥚 Calendar</button><button type="button" data-mobile-go="backup">💾 Backup</button></div></div><p class="mobile-notice">📱 Phone-friendly layout is ready. Records saved in your computer's browser do <strong>not</strong> automatically appear on your phone. Export a backup and restore it on the other device to transfer records. This version does not send phone notifications.</p><nav class="tabs" aria-label="Sections"><button class="active" data-tab="dashboard">Dashboard</button><button data-tab="pens">Pens</button><button data-tab="birds">Birds</button><button data-tab="eggs">Egg Log</button><button data-tab="breeding">Breeding</button><button data-tab="hatches">Hatches</button><button data-tab="family">Family Trees</button><button data-tab="profiles">Bird Profiles</button><button data-tab="losses">Loss Tracker</button><button data-tab="sales">Sales</button><button data-tab="expenses">Expenses</button><button data-tab="finances">Finances</button><button data-tab="taxreports">📊 Tax Reports</button><button data-tab="equipment">🧰 Equipment & Supplies</button><button data-tab="feed">Feed Tracker</button><button data-tab="health">Health Records</button><button data-tab="calendar">📅 Farm Calendar</button><button data-tab="operations">🌿 Daily Operations</button><button data-tab="cloud">☁️ Cloud</button><button data-tab="backup">Backup</button></nav>
+<section id="dashboard" class="page"><div class="panel"><h2>🏡 Farm Command Center · Phase 28</h2><p class="muted">Live snapshot of records stored in this browser. Test data is included until you remove it. Cloud synchronization is not automatic.</p><div class="stats"><div class="stat">Pens<strong id="penCount">0</strong></div><div class="stat">Birds<strong id="birdCount">0</strong></div><div class="stat">Eggs today<strong id="eggCount">0</strong></div><div class="stat">Open health cases<strong id="d28Health">0</strong></div><div class="stat">Follow-ups due<strong id="d28Followups">0</strong></div><div class="stat">Chores due<strong id="d28Chores">0</strong></div><div class="stat">Upcoming chores<strong id="d28Upcoming">0</strong></div><div class="stat">Supply alerts<strong id="d28Supplies">0</strong></div><div class="stat">Feed remaining (lb)<strong id="d28Feed">0</strong></div><div class="stat">Eggs this month<strong id="d28EggMonth">0</strong></div><div class="stat">Recorded sales this year<strong id="d28Sales">$0.00</strong></div><div class="stat">Recorded expenses this year<strong id="d28Expenses">$0.00</strong></div></div><div class="actions"><button type="button" id="d28Refresh">↻ Refresh dashboard</button><button type="button" id="d28Export">Export dashboard snapshot CSV</button></div><p id="d28Updated" class="muted"></p></div><div class="panel"><h2>⚠️ Needs your attention</h2><div id="d28Alerts"></div></div><div class="panel"><h2>🐣 Hatches & farm activity</h2><div id="d28Hatches"></div></div></section>
+<section id="operations" class="page hidden"><div class="panel"><h2>🌿 Daily Farm Operations</h2><p class="muted">One checklist, two ways to work. Switch views without losing your place. Chores come from Farm Calendar and use the same completion history.</p><div class="stats"><div class="stat">Due / overdue<strong id="opsDue">0</strong></div><div class="stat">Upcoming<strong id="opsUpcoming">0</strong></div><div class="stat">Completed today<strong id="opsCompleted">0</strong></div></div><div class="panel" id="p25Panel"><h2>📋 Phase 25 · Daily Pen Checklist</h2><p class="muted">Build recurring feeding, watering, and cleaning chores for selected pens. These use your existing Daily Operations and Farm Calendar tasks, so completed chores stay in the same history.</p>
+<div class="fields"><div><label for="p25Date">Start date</label><input id="p25Date" type="date"></div><div><label for="p25Repeat">Repeat</label><select id="p25Repeat"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="none">One time</option></select></div></div>
+<h3>Chores to create</h3><div class="fields"><label><input type="checkbox" id="p25Feed" checked> Feed birds</label><label><input type="checkbox" id="p25Water" checked> Check / refill water</label><label><input type="checkbox" id="p25Clean"> Clean pen / waterers</label><label><input type="checkbox" id="p25Observe"> Observe birds for health concerns</label></div>
+<h3>Select pens</h3><div id="p25Pens"></div><div class="actions"><button type="button" class="primary" id="p25Create">Create selected chores</button><button type="button" id="p25HistoryCsv">Export chore history CSV</button></div><p id="p25Status" role="status"></p>
+<h3>Completed chore history</h3><div class="fields"><div><label for="p25HistoryDate">Completed on</label><input id="p25HistoryDate" type="date"></div><div><label for="p25HistoryPen">Pen</label><select id="p25HistoryPen"></select></div></div><div id="p25History"></div></div><div class="ops-toggle"><button type="button" id="opsPenView" class="selected" aria-pressed="true">🐓 Pen View</button><button type="button" id="opsTaskView" aria-pressed="false">🧹 Task View</button></div><div class="ops-quick"><h3>⚡ Quick add a chore</h3><form id="opsQuickForm"><div class="fields"><div><label for="opsTitle">Chore</label><input id="opsTitle" placeholder="Refill waterers" required></div><div><label for="opsPen">Pen</label><select id="opsPen"></select></div><div><label for="opsDate">Due date</label><input id="opsDate" type="date" required></div><div><label for="opsRepeat">Repeat</label><select id="opsRepeat"><option value="none">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div></div><button class="primary">+ Add chore</button></form></div><div id="opsGroups"></div><h3>✓ Completed today</h3><div id="opsHistory"></div><p class="muted">Reminders are shown when you open FlockVault. This browser version does not send phone notifications.</p></div></section><section id="pens" class="page hidden"><div class="panel"><h2>Your pens</h2><div id="penList"></div></div><div class="panel"><h2>Add a pen</h2><form id="penForm"><label for="penName">Pen name</label><input id="penName" required placeholder="e.g. Duck breeding pen"><label for="penNotes">Notes</label><textarea id="penNotes" placeholder="Breed, purpose, location..."></textarea><div class="actions"><button class="primary">Save pen</button></div></form></div></section>
+<section id="birds" class="page hidden"><div class="panel"><h2>Bird inventory</h2><div id="birdList"></div></div><div class="panel"><h2>Add a bird</h2><form id="birdForm"><div class="fields"><div><label for="birdId">Bird ID</label><input id="birdId" required placeholder="e.g. GF-001"></div><div><label for="birdName">Name (optional)</label><input id="birdName" placeholder="e.g. Honey"></div><div><label for="birdType">Type</label><select id="birdType"><option>Chicken</option><option>Duck</option><option>Goose</option><option>Other</option></select></div><div><label for="birdSex">Sex</label><select id="birdSex"><option>Unknown</option><option>Hen/Female</option><option>Roo/Drake/Male</option></select></div><div><label for="birdBreed">Breed / bloodline</label><input id="birdBreed" placeholder="e.g. McLain Hatch × Powell Blue"></div><div><label for="birdPen">Pen</label><select id="birdPen"></select></div></div><label for="birdNotes">Notes</label><textarea id="birdNotes"></textarea><div class="actions"><button class="primary">Save bird</button></div></form></div></section>
+<section id="eggs" class="page hidden"><div class="panel" id="phase22Panel">
+<h2>🥚 Phase 22 · Egg Collection & Sales Manager</h2>
+<p class="muted">Review collections by date and pen, then optionally link an egg sale to a specific collection. Linked sales are also recorded in the existing Sales and Finances tabs.</p>
+<div class="fields">
+<div><label for="p22From">From date</label><input type="date" id="p22From"></div>
+<div><label for="p22To">To date</label><input type="date" id="p22To"></div>
+<div><label for="p22Pen">Pen filter</label><select id="p22Pen"></select></div>
+</div>
+<div class="actions"><button type="button" id="p22Refresh">Update summary</button><button type="button" id="p22Export">Export egg summary CSV</button></div>
+<div id="p22Summary" aria-live="polite"></div>
+<h3>Sell eggs from a recorded collection</h3>
+<p class="muted">This is optional. Sales entered directly in the Sales tab are not automatically assigned to a collection. Only sales linked here reduce the available quantity shown below.</p>
+<form id="p22SaleForm">
+<div class="fields">
+<div><label for="p22Collection">Collection</label><select id="p22Collection" required></select></div>
+<div><label for="p22SaleDate">Sale date</label><input id="p22SaleDate" type="date" required></div>
+<div><label for="p22Kind">Egg type</label><select id="p22Kind"><option>Eating Eggs</option><option>Hatching Eggs</option></select></div>
+<div><label for="p22Qty">Eggs sold (individual eggs)</label><input id="p22Qty" type="number" min="1" step="1" required value="6"></div>
+<div><label for="p22Price">Total received ($)</label><input id="p22Price" type="number" min="0" step="0.01" required></div>
+<div><label for="p22Customer">Customer (optional)</label><input id="p22Customer" type="text"></div>
+</div>
+<label for="p22Notes">Notes</label><textarea id="p22Notes" placeholder="Breed, payment method, pickup..."></textarea>
+<div class="actions"><button class="primary" type="submit">Record linked egg sale</button></div>
+</form>
+<p id="p22Message" role="status"></p>
+<div id="p22Sales"></div>
+</div><div class="panel"><h2>Egg collection log</h2><div id="eggList"></div></div><div class="panel"><h2>Record collection</h2><form id="eggForm"><div class="fields"><div><label for="eggDate">Date</label><input id="eggDate" type="date" required></div><div><label for="eggPen">Pen</label><select id="eggPen"></select></div><div><label for="eggQty">Eggs collected</label><input id="eggQty" type="number" min="0" max="10000" required value="1"></div></div><label for="eggNotes">Notes</label><textarea id="eggNotes" placeholder="Broken, fertile, reserved..."></textarea><div class="actions"><button class="primary">Save collection</button></div></form></div></section>
+<section id="breeding" class="page hidden"><div class="panel"><h2>Breeding records</h2><div id="breedingList"></div></div><div class="panel"><h2>Add breeding group</h2><form id="breedingForm"><div class="fields"><div><label for="breedingName">Group name</label><input id="breedingName" required placeholder="Honey breeding pen"></div><div><label for="breedingMale">Rooster / drake</label><select id="breedingMale"></select></div><div><label for="breedingFemales">Hen IDs (comma separated)</label><input id="breedingFemales" placeholder="GF-002, GF-003"></div><div><label for="breedingDate">Start date</label><input id="breedingDate" type="date" required></div><div><label for="breedingPen">Pen</label><select id="breedingPen"></select></div></div><label for="breedingNotes">Bloodline / notes</label><textarea id="breedingNotes"></textarea><div class="actions"><button class="primary">Save breeding group</button></div></form></div></section>
+<section id="hatches" class="page hidden"><div class="panel"><h2>🥚 Phase 20 · Incubation planner</h2><p class="muted">Select a species and set date to calculate an estimated hatch date. Actual incubation varies by breed and conditions. This is a planning guide, not an automatic reminder.</p><div class="fields"><div><label for="incSpecies">Egg type</label><select id="incSpecies"><option value="21">Chicken / bantam / Serama · ~21 days</option><option value="28">Most domestic ducks · ~28 days</option><option value="35">Muscovy duck · ~35 days</option><option value="28">Goose · ~28–35 days (varies)</option><option value="28">Turkey · ~28 days</option><option value="18">Quail (Coturnix) · ~17–18 days</option><option value="custom">Custom duration</option></select></div><div><label for="incDays">Incubation days</label><input id="incDays" type="number" min="1" max="70" value="21"></div><div><label for="incSet">Set date</label><input id="incSet" type="date"></div></div><div class="actions"><button type="button" id="incCalculate" class="primary">Calculate estimated hatch date</button><button type="button" id="incApply">Copy dates into hatch form</button></div><p id="incResult" role="status">Enter a set date to calculate.</p></div><div class="panel"><h2>🐣 Hatch overview</h2><div id="hatchOverview"></div><p class="muted">Hatch rate = chicks hatched ÷ eggs set. It does not measure fertility unless infertile eggs are tracked separately.</p></div><div class="panel"><h2>Hatch records</h2><div id="hatchList"></div></div><div class="panel"><h2>Record a hatch</h2><form id="hatchForm"><div class="fields"><div><label for="hatchId">Hatch ID</label><input id="hatchId" required placeholder="HATCH-001"></div><div><label for="hatchSet">Eggs set date</label><input id="hatchSet" type="date" required></div><div><label for="hatchDue">Expected hatch date</label><input id="hatchDue" type="date"></div><div><label for="hatchActual">Actual hatch date</label><input id="hatchActual" type="date"></div><div><label for="hatchEggs">Eggs set</label><input id="hatchEggs" type="number" min="0" value="0"></div><div><label for="hatchChicks">Chicks hatched</label><input id="hatchChicks" type="number" min="0" value="0"></div><div><label for="hatchGroup">Breeding group</label><select id="hatchGroup"></select></div><div><label for="hatchSpecies">Egg type</label><select id="hatchSpecies"><option value="Chicken">Chicken / bantam / Serama</option><option value="Duck">Duck</option><option value="Muscovy">Muscovy duck</option><option value="Goose">Goose</option><option value="Turkey">Turkey</option><option value="Quail">Quail</option><option value="Other">Other</option></select></div><div><label for="hatchStage">Stage</label><select id="hatchStage"><option value="Incubating">Incubating</option><option value="Candling">Candling</option><option value="Lockdown">Lockdown</option><option value="Completed">Completed</option></select></div></div><label for="hatchNotes">Notes</label><textarea id="hatchNotes"></textarea><div class="actions"><button class="primary">Save hatch</button></div></form></div></section>
+<section id="family" class="page hidden"><div class="panel" id="phase21Panel"><h2>🧬 Phase 21 · Breeding & Bloodline Connections</h2>
+<p class="muted">Connect a registered chick to a hatch and breeding group, then view its parentage and siblings. All changes stay local until you manually use the Cloud tab.</p>
+<div class="fields">
+<div><label for="p21Chick">Registered offspring</label><select id="p21Chick"></select></div>
+<div><label for="p21Hatch">Hatch record</label><select id="p21Hatch"></select></div>
+<div><label for="p21Group">Breeding group</label><select id="p21Group"></select></div>
+</div>
+<div class="actions"><button class="primary" type="button" id="p21Save">Save offspring connections</button></div>
+<p id="p21Message" role="status"></p>
+<div id="p21Summary"></div>
+</div><div class="panel"><h2>🧬 Family Trees & Bloodlines</h2><p class="muted">Register parent birds first, then connect a chick to its mother and father. Unknown parents can stay blank.</p><label for="familyBird">Choose a bird</label><select id="familyBird"></select><div id="familyTree" class="panel" style="margin-top:16px;background:#f3f7f0"></div></div><div class="panel"><h2>Connect parents to a bird</h2><form id="parentForm"><div class="fields"><div><label for="childId">Offspring</label><select id="childId" required></select></div><div><label for="fatherId">Father / sire</label><select id="fatherId"></select></div><div><label for="motherId">Mother / dam</label><select id="motherId"></select></div></div><div class="actions"><button class="primary">Save parentage</button></div></form><p id="parentStatus" role="status"></p></div></section>
+<section id="profiles" class="page hidden"><div class="panel"><h2>🐓 Bird Profiles & Pedigrees</h2><label for="profileBird">Choose a bird</label><select id="profileBird"></select><div id="profileDetails" style="margin-top:16px"></div></div><div class="panel"><h2>Update bird details</h2><form id="profileForm"><div class="fields"><div><label for="profileStatus">Status</label><select id="profileStatus"><option>Active</option><option>Sold</option><option>Deceased</option><option>Retired</option><option>Transferred</option></select></div><div><label for="profileHatch">Hatch / birth date</label><input id="profileHatch" type="date"></div><div><label for="profileValue">Estimated value ($)</label><input id="profileValue" type="number" min="0" step="0.01" placeholder="Optional"></div></div><label for="profileEvent">Add history note (optional)</label><textarea id="profileEvent" placeholder="Vaccination, treatment, award, breeding observation..."></textarea><div class="actions"><button class="primary">Save profile</button></div></form><p class="muted">Values are your estimates, not automatically tax-deductible amounts. Keep receipts and supporting records.</p><p id="profileStatusMsg" role="status"></p></div></section>
+<section id="losses" class="page hidden"><div class="panel"><h2>Loss Tracker</h2><p class="muted">Document losses for farm records. These amounts are recordkeeping estimates, not tax determinations.</p><div id="lossList"></div></div><div class="panel"><h2>Record a loss</h2><form id="lossForm"><div class="fields"><div><label for="lossBird">Bird</label><select id="lossBird" required></select></div><div><label for="lossDate">Date of loss</label><input id="lossDate" type="date" required></div><div><label for="lossCause">Cause</label><select id="lossCause"><option>Predator</option><option>Illness</option><option>Injury</option><option>Unknown</option><option>Other</option></select></div><div><label for="lossValue">Estimated value ($)</label><input id="lossValue" type="number" min="0" step="0.01" placeholder="Optional"></div></div><label for="lossNotes">Notes / supporting records</label><textarea id="lossNotes" placeholder="What happened, receipts, veterinary records..."></textarea><div class="actions"><button class="primary">Save loss</button></div></form><p id="lossStatusMsg" role="status"></p></div></section>
+
+<section id="sales" class="page hidden"><div class="panel"><h2>💵 Farm Sales</h2><p class="muted">Record poultry, hatching egg, eating egg and other farm sales. A registered bird sale automatically marks that bird Sold.</p><div id="saleList"></div></div><div class="panel"><h2>Add sale</h2><form id="saleForm"><div class="fields"><div><label for="saleDate">Date</label><input id="saleDate" type="date" required></div><div><label for="saleType">Sale type</label><select id="saleType"><option>Bird</option><option>Hatching Eggs</option><option>Eating Eggs</option><option>Other</option></select></div><div><label for="saleBird">Bird (for individual bird sale)</label><select id="saleBird"></select></div><div><label for="saleDescription">Description</label><input id="saleDescription" placeholder="e.g. 6 call duck eggs" required></div><div><label for="saleQuantity">Quantity</label><input id="saleQuantity" type="number" min="1" step="1" value="1" required></div><div><label for="saleTotal">Total received ($)</label><input id="saleTotal" type="number" min="0" step="0.01" required></div><div><label for="saleCustomer">Customer (optional)</label><input id="saleCustomer"></div></div><label for="saleNotes">Notes / payment method</label><textarea id="saleNotes"></textarea><div class="actions"><button class="primary">Save sale</button></div></form><p id="saleMessage" role="status"></p></div></section>
+<section id="expenses" class="page hidden"><div class="panel"><h2>🧾 Farm Expenses</h2><p class="muted">Save receipts separately. These entries are bookkeeping records, not automatic tax deductions.</p><div id="expenseList"></div></div><div class="panel"><h2>Add expense</h2><form id="expenseForm"><div class="fields"><div><label for="expenseDate">Date</label><input id="expenseDate" type="date" required></div><div><label for="expenseCategory">Category</label><select id="expenseCategory"><option>Feed</option><option>Bedding</option><option>Veterinary / Medication</option><option>Bird Purchases</option><option>Equipment</option><option>Repairs</option><option>Utilities</option><option>Other</option></select></div><div><label for="expenseDescription">Description</label><input id="expenseDescription" required placeholder="e.g. Flock Raiser feed"></div><div><label for="expenseAmount">Amount paid ($)</label><input id="expenseAmount" type="number" min="0" step="0.01" required></div><div><label for="expenseVendor">Vendor (optional)</label><input id="expenseVendor"></div><div><label for="expenseReceipt">Receipt number / reference</label><input id="expenseReceipt"></div></div><label for="expenseNotes">Notes</label><textarea id="expenseNotes"></textarea><div class="actions"><button class="primary">Save expense</button></div></form></div></section>
+<section id="equipment" class="page hidden"><div class="panel"><h2>🧰 Phase 27 · Equipment & Supply Inventory</h2><p class="muted">Track incubators, brooders, feeders, supplies, and maintenance. This is an inventory log, not an accounting depreciation schedule. Records stay in your local browser until you export a JSON backup.</p><div class="stats"><div class="stat">Inventory items<strong id="p27Count">0</strong></div><div class="stat">Low stock items<strong id="p27Low">0</strong></div><div class="stat">Maintenance due<strong id="p27Due">0</strong></div></div><h3>Add equipment or supplies</h3><form id="p27Form"><div class="fields"><div><label for="p27Name">Item name</label><input id="p27Name" required placeholder="e.g. TEST incubator"></div><div><label for="p27Category">Category</label><select id="p27Category"><option>Equipment</option><option>Feeders & waterers</option><option>Brooder supplies</option><option>Medication / first aid</option><option>Cleaning supplies</option><option>Other supplies</option></select></div><div><label for="p27Qty">Quantity</label><input id="p27Qty" type="number" min="0" step="0.01" value="1" required></div><div><label for="p27Unit">Unit</label><select id="p27Unit"><option>each</option><option>lb</option><option>bags</option><option>bottles</option><option>boxes</option><option>packs</option></select></div><div><label for="p27Minimum">Low-stock warning at or below</label><input id="p27Minimum" type="number" min="0" step="0.01" placeholder="Optional"></div><div><label for="p27Location">Location / pen</label><input id="p27Location" placeholder="Storage shed, Pen 1..."></div><div><label for="p27Cost">Purchase cost ($, optional)</label><input id="p27Cost" type="number" min="0" step="0.01" placeholder="0.00"></div><div><label for="p27Purchased">Purchase date</label><input id="p27Purchased" type="date"></div><div><label for="p27Maintenance">Next maintenance / inspection</label><input id="p27Maintenance" type="date"></div></div><label for="p27Notes">Notes</label><textarea id="p27Notes" placeholder="Serial number, condition, supplier, storage notes"></textarea><button type="submit" class="primary">Save inventory item</button></form><h3>Inventory records</h3><div class="fields"><div><label for="p27Filter">Filter</label><select id="p27Filter"><option value="all">All inventory</option><option value="low">Low stock</option><option value="due">Maintenance due</option></select></div></div><div id="p27List"></div><h3>Record a quantity change or maintenance</h3><form id="p27Update"><div class="fields"><div><label for="p27Select">Inventory item</label><select id="p27Select" required></select></div><div><label for="p27Action">Update type</label><select id="p27Action"><option value="use">Used / removed</option><option value="add">Restocked / added</option><option value="maintenance">Maintenance completed</option><option value="inspect">Inspection / note</option></select></div><div><label for="p27Change">Quantity changed (0 for maintenance)</label><input id="p27Change" type="number" min="0" step="0.01" value="1" required></div><div><label for="p27UpdateDate">Date</label><input id="p27UpdateDate" type="date" required></div><div><label for="p27Next">Next maintenance date (optional)</label><input id="p27Next" type="date"></div></div><label for="p27UpdateNotes">Update notes</label><textarea id="p27UpdateNotes" placeholder="What was used, repaired, or checked?"></textarea><button type="submit" class="primary">Save update</button></form><div class="actions"><button id="p27Csv" type="button">Export inventory CSV</button><button id="p27HistoryCsv" type="button">Export maintenance & usage history CSV</button></div><p id="p27Status" role="status"></p></div></section><section id="taxreports" class="page hidden"><div class="panel"><h2>📊 Phase 26 · Farm Reports & Tax Center</h2><p class="muted">Recordkeeping summaries only, not a tax return or a determination of deductible expenses. Test entries appear in reports until removed from the underlying records. Check every figure against receipts and bank records.</p><div class="fields"><div><label for="p26Year">Tax year</label><select id="p26Year"></select></div></div><div class="stats"><div class="stat">Recorded sales<strong id="p26Sales">$0.00</strong></div><div class="stat">Recorded expenses<strong id="p26Expenses">$0.00</strong></div><div class="stat">Sales less expenses<strong id="p26Difference">$0.00</strong></div><div class="stat">Feed purchases (reference only)<strong id="p26Feed">$0.00</strong></div><div class="stat">Recorded bird losses<strong id="p26Losses">0</strong></div><div class="stat">Estimated lost-bird values<strong id="p26LossValue">$0.00</strong></div></div><p class="muted">Feed purchases are shown separately for reconciliation and are NOT added to recorded expenses. Bird loss values are estimates and are NOT deducted. Sales less expenses is not taxable profit.</p><h3>Expense categories</h3><div id="p26Categories"></div><h3>Records to reconcile</h3><div id="p26Reconcile"></div><div class="actions"><button id="p26Print" type="button">Print year summary</button><button id="p26SalesCsv" type="button">Export year sales CSV</button><button id="p26ExpenseCsv" type="button">Export year expenses CSV</button><button id="p26FeedCsv" type="button">Export year feed purchases CSV</button><button id="p26LossCsv" type="button">Export year bird losses CSV</button></div><p id="p26Status" role="status"></p></div></section><section id="finances" class="page hidden"><div class="panel"><h2>📊 Financial Overview</h2><div class="stats"><div class="stat">Sales<strong id="finSales">$0.00</strong></div><div class="stat">Expenses<strong id="finExpenses">$0.00</strong></div><div class="stat">Difference<strong id="finNet">$0.00</strong></div></div><p class="muted">Difference is sales minus recorded expenses, not taxable profit. Does not account for inventory basis, depreciation, taxes, or other adjustments.</p><div class="actions"><button id="exportSales" type="button">Export sales CSV</button><button id="exportExpenses" type="button">Export expenses CSV</button></div></div></section>
+<section id="feed" class="page hidden"><div class="panel" id="phase23Panel"><h2>🌾 Phase 23 · Feed Inventory & Low-Stock Alerts</h2><p class="muted">Inventory is estimated from feed purchases minus logged usage. Use the same feed name for purchases and usage. These warnings are local to this browser and are not automatic notifications.</p><div class="fields"><div><label for="p23Threshold">Low-stock warning below (lb per feed)</label><input id="p23Threshold" type="number" min="0" step="1" value="25"></div><div><label for="p23Filter">Show</label><select id="p23Filter"><option value="all">All feeds</option><option value="low">Low or negative only</option></select></div></div><div class="actions"><button type="button" id="p23Export">Export inventory CSV</button></div><p id="p23Notice" role="status"></p><div id="p23Inventory"></div><h3>Estimated cost by pen</h3><div id="p23Pens"></div></div><div class="panel"><h2>🥣 Feed Tracker · By Pen</h2><p class="muted">Record feed purchases, then log daily usage or a weekly total. Weekly totals are only for weeks without daily entries for the same pen and feed.</p><div class="stats"><div class="stat">Purchased (lb)<strong id="feedPurchased">0</strong></div><div class="stat">Used (lb)<strong id="feedUsed">0</strong></div><div class="stat">Estimated remaining (lb)<strong id="feedRemaining">0</strong></div></div><p class="muted">Remaining is an estimate based on purchases and recorded usage. Cost per pen uses the average purchase price per pound for each feed.</p></div>
+<div class="panel"><h2>Buy feed</h2><form id="feedPurchaseForm"><div class="fields"><div><label for="fpDate">Purchase date</label><input id="fpDate" type="date" required></div><div><label for="fpName">Feed name / brand</label><input id="fpName" list="feedBrands" required placeholder="Purina Flock Raiser"></div><div><label for="fpBags">Number of bags</label><input id="fpBags" type="number" min="0.01" step="0.01" value="1" required></div><div><label for="fpBagWeight">Pounds per bag</label><input id="fpBagWeight" type="number" min="0.01" step="0.01" value="50" required></div><div><label for="fpCost">Total paid ($)</label><input id="fpCost" type="number" min="0" step="0.01" required></div><div><label for="fpVendor">Store (optional)</label><input id="fpVendor"></div></div><button class="primary">Save feed purchase</button></form><datalist id="feedBrands"><option value="Purina Flock Raiser"><option value="Nutrena All Flock"><option value="Kalmbach Flock Maker"><option value="Mazuri Waterfowl Starter"><option value="DuMOR Duck Feed"><option value="Feather Fixer"></datalist><div id="feedPurchaseList"></div></div>
+<div class="panel"><h2>Log feed used</h2><form id="feedUsageForm"><div class="fields"><div><label for="fuMode">Log type</label><select id="fuMode"><option value="daily">Daily</option><option value="weekly">Weekly total</option></select></div><div><label for="fuDate">Date / week starting</label><input id="fuDate" type="date" required></div><div><label for="fuPen">Pen</label><select id="fuPen" required></select></div><div><label for="fuName">Feed brand / type</label><input id="fuName" list="feedBrands" required></div><div><label for="fuPounds">Pounds used</label><input id="fuPounds" type="number" min="0.01" step="0.01" required></div></div><label for="fuNotes">Notes</label><textarea id="fuNotes"></textarea><div class="actions"><button class="primary">Save feed log</button></div><p id="feedStatus" role="status"></p></form></div>
+<div class="panel"><h2>Feed usage by pen</h2><div id="feedPenSummary"></div><h3>Usage history</h3><div id="feedUsageList"></div><div class="actions"><button id="feedExport" type="button">Export feed CSV</button></div></div></section>
+<section id="health" class="page hidden"><div class="panel" id="phase24Panel">
+<h2>💊 Phase 24 · Treatment & Recovery Manager</h2>
+<p class="muted">Track a health case from first observation through treatment and recovery. Record only treatments and withdrawal dates provided by your veterinarian or product label. This tool does not recommend doses or determine whether eggs or meat are safe.</p>
+<div class="stats">
+<div class="stat">Open cases<strong id="p24Open">0</strong></div>
+<div class="stat">Follow-ups due<strong id="p24Due">0</strong></div>
+<div class="stat">Treatment entries<strong id="p24Entries">0</strong></div>
+</div>
+<div class="fields">
+<div><label for="p24Filter">Show cases</label><select id="p24Filter"><option value="all">All cases</option><option value="open">Open only</option><option value="due">Follow-ups due</option><option value="closed">Closed only</option></select></div>
+<div><label for="p24Case">Health case</label><select id="p24Case"></select></div>
+<div><label for="p24ActionDate">Update date</label><input id="p24ActionDate" type="date"></div>
+<div><label for="p24Action">Case update</label><select id="p24Action"><option value="treatment">Treatment administered / care performed</option><option value="observation">Observation / progress note</option><option value="followup">Follow-up completed</option><option value="closed">Recovered / case closed</option><option value="reopen">Reopen case</option></select></div>
+</div>
+<label for="p24Detail">What happened? (required)</label><textarea id="p24Detail" placeholder="What was observed or administered, and any exact vet instructions followed"></textarea>
+<div class="actions"><button class="primary" id="p24Save" type="button">Save case update</button><button id="p24Csv" type="button">Export treatment history CSV</button></div>
+<p id="p24Message" role="status"></p>
+<div id="p24List"></div>
+</div><div class="panel"><h2>🩺 Health & Treatment Records</h2><p class="muted">Record observations and veterinary instructions for individual birds or entire pens. The app does not calculate doses or withdrawal times.</p><div class="stats"><div class="stat">Health records<strong id="healthCount">0</strong></div><div class="stat">Follow-ups due<strong id="healthDue">0</strong></div></div><div id="healthList"></div><div class="actions"><button id="healthExport" type="button">Export health CSV</button></div></div><div class="panel"><h2>Add health record</h2><form id="healthForm"><div class="fields"><div><label for="healthDate">Observation date</label><input type="date" id="healthDate" required></div><div><label for="healthScope">Treat</label><select id="healthScope"><option value="bird">Individual bird</option><option value="pen">Entire pen</option></select></div><div id="healthBirdWrap"><label for="healthBird">Bird</label><select id="healthBird"></select></div><div id="healthPenWrap" class="hidden"><label for="healthPen">Pen</label><select id="healthPen"></select></div><div><label for="healthCategory">Record type</label><select id="healthCategory"><option>Observation</option><option>Injury</option><option>Illness</option><option>Medication</option><option>Veterinary visit</option><option>Follow-up</option></select></div><div><label for="healthFollowup">Follow-up date (optional)</label><input type="date" id="healthFollowup"></div></div><label for="healthSymptoms">Symptoms / observations</label><textarea id="healthSymptoms" required></textarea><div class="fields"><div><label for="healthMedication">Medication / treatment (optional)</label><input id="healthMedication"></div><div><label for="healthDose">Dose / route / frequency (copy exact vet instructions; optional)</label><input id="healthDose"></div><div><label for="healthStart">Treatment start (optional)</label><input type="date" id="healthStart"></div><div><label for="healthEnd">Treatment end (optional)</label><input type="date" id="healthEnd"></div><div><label for="healthEgg">Egg withdrawal end (vet-confirmed only; optional)</label><input type="date" id="healthEgg"></div><div><label for="healthMeat">Meat withdrawal end (vet-confirmed only; optional)</label><input type="date" id="healthMeat"></div></div><label for="healthNotes">Vet, source of instructions, notes</label><textarea id="healthNotes"></textarea><div class="actions"><button class="primary">Save health record</button></div><p id="healthStatus" role="status"></p></form></div></section>
+<section id="cloud" class="page hidden"><div class="panel"><h2>☁️ Cloud saving · Phase 19</h2><p><strong>Safe cloud write test.</strong> Your existing farm records remain on this device. Only a clearly labeled test record is sent when you click Save test record. Nothing is automatically uploaded, merged, downloaded, or overwritten.</p><p class="muted">Sign in using your existing invited FlockVault account. Use the same Supabase Project URL and publishable key from Phase 14. Never enter a secret/service_role key.</p><div class="fields"><div><label for="cloudUrl">Supabase Project URL</label><input id="cloudUrl" placeholder="https://your-project.supabase.co" autocomplete="off"></div><div><label for="cloudKey">Publishable key</label><input id="cloudKey" placeholder="sb_publishable_..." autocomplete="off" type="password"></div><div><label for="cloudEmail">Account email</label><input id="cloudEmail" type="email" autocomplete="email"></div><div><label for="cloudPassword">Password</label><input id="cloudPassword" type="password" autocomplete="current-password"></div></div><div class="actions"><button type="button" id="cloudConnect" class="primary">Connect & sign in</button><button type="button" id="cloudCheck">Check my farm</button><button type="button" id="cloudSignOut">Sign out</button></div><p id="cloudStatus" role="status" style="white-space:pre-wrap;overflow-wrap:anywhere"></p><div id="cloudFarms"></div><div class="panel" style="margin-top:18px"><h3>🧪 Step 2: Save a harmless cloud test record</h3><p class="muted">First run the included <strong>Phase16-Cloud-Test-Setup.sql</strong> in Supabase SQL Editor. This creates a separate, access-controlled test table. Then sign in above and click Save test record. This will NOT upload your actual FlockVault inventory or change local data.</p><div class="actions"><button type="button" id="cloudTestSave" class="primary">Save test record</button><button type="button" id="cloudTestRead">Verify saved test records</button></div><p id="cloudTestStatus" role="status" style="white-space:pre-wrap;overflow-wrap:anywhere"></p><div id="cloudTestResults"></div></div><div class="panel" style="margin-top:18px"><h3>🐓 Phase 17: Birds &amp; Pens Cloud Upload</h3><p><strong>Manual upload only.</strong> Preview your local birds and pens and check for records already saved to your farm in Supabase. Upload only records that are missing. Nothing is downloaded or merged into your browser. No existing cloud record is updated or deleted.</p><p class="muted">IMPORTANT: Use the same browser and computer where your real FlockVault records are stored. Keep your exported JSON backup safe. If you see unexpected counts, do not upload.</p><div class="actions"><button type="button" id="cloudInventoryPreview" class="primary">1. Preview birds &amp; pens</button><button type="button" id="cloudInventoryUpload" disabled>2. Upload missing records</button><button type="button" id="cloudInventoryVerify">3. Verify cloud counts</button></div><p id="cloudInventoryStatus" role="status" style="white-space:pre-wrap;overflow-wrap:anywhere"></p><div id="cloudInventoryResults"></div></div><div class="panel" style="margin-top:18px"><h3>☁️ Phase 19: Restore Birds and Pens to a New Device</h3><p><strong>Cloud to this device, manual only.</strong> First preview what is in your farm's cloud. Download a JSON copy of the cloud birds and pens for safekeeping. You may then choose to add ONLY missing IDs to this browser. Matching IDs are never replaced, and different contents are flagged as conflicts. Other farm data is not touched.</p><p class="muted">Before any local import, FlockVault will download a backup of this browser's current farm data (an empty starter backup on a new device). Save that file. Importing requires your confirmation and a page reload.</p><div class="actions"><button type="button" id="cloudDownloadPreview" class="primary">1. Preview cloud download</button><button type="button" id="cloudDownloadExport" disabled>2. Download cloud JSON</button><button type="button" id="cloudDownloadImport" disabled>3. Add missing to this device</button></div><p id="cloudDownloadStatus" role="status" style="white-space:pre-wrap;overflow-wrap:anywhere"></p><div id="cloudDownloadResults"></div></div><p class="muted">Phase 19 supports empty-device recovery and a manual, preview-first cloud download of birds and pens. It does not automatically sync or overwrite existing records. Keep JSON backups.</p></div></section><section id="backup" class="page hidden"><div class="panel"><h2>Keep your records safe</h2><p>Download a JSON backup regularly. Browser data can be lost if the browser is reset or site data is cleared.</p><div class="actions"><button class="primary" id="exportBtn">Download backup</button></div><label for="importFile">Restore from a FlockVault backup</label><input type="file" id="importFile" accept="application/json,.json"><p class="muted">Restoring replaces all records currently in this browser. No data is uploaded to a server.</p><p id="importStatus" role="status"></p></div></section>
+<section id="calendar" class="page hidden"><div class="panel"><h2>📅 Farm Calendar & Reminders</h2><p class="muted">Hatch dates and health follow-ups appear automatically. All entries stay in this browser and are included in your JSON backup.</p><div class="fields"><div><label for="calMonth">View month</label><input id="calMonth" type="month"></div></div><div class="stats"><div class="stat"><strong id="calDue">0</strong><span>Open tasks due or overdue</span></div><div class="stat"><strong id="calBroody">0</strong><span>Broody hen records</span></div></div><h3>Upcoming & monthly events</h3><div id="calEvents"></div></div><div class="panel"><h2>🥚 Broody hen tracker</h2><form id="broodyForm"><div class="fields"><div><label for="broodyBird">Hen</label><select id="broodyBird" required></select></div><div><label for="broodyStart">Started sitting</label><input id="broodyStart" type="date" required></div><div><label for="broodyDue">Expected hatch (editable)</label><input id="broodyDue" type="date" required></div><div><label for="broodyEggs">Eggs under hen</label><input id="broodyEggs" type="number" min="0" value="0"></div></div><label for="broodyNotes">Notes</label><textarea id="broodyNotes" placeholder="Nest, breed, checks, etc."></textarea><button class="primary">Save broody record</button></form><div id="broodyList"></div></div><div class="panel"><h2>🧹 Farm chores & reminders</h2><form id="taskForm"><div class="fields"><div><label for="taskTitle">Task</label><input id="taskTitle" required placeholder="Clean Pen 3 waterer"></div><div><label for="taskDate">Due date</label><input id="taskDate" type="date" required></div><div><label for="taskPen">Pen (optional)</label><select id="taskPen"></select></div><div><label for="taskRepeat">Repeat</label><select id="taskRepeat"><option value="none">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div></div><label for="taskNotes">Notes</label><textarea id="taskNotes"></textarea><button class="primary">Add task</button></form><p class="muted">Daily and weekly tasks roll forward when marked done. Reminders appear inside FlockVault when you open it; they are not phone notifications.</p><div id="taskList"></div></div></section></main><footer>FlockVault · Phase 17 birds and pens upload · Click & Sons, LLC</footer><script>
+'use strict';const KEY='flockvault-phase1-v1';const defaultState=()=>({pens:Array.from({length:10},(_,i)=>({id:crypto.randomUUID(),name:`Pen ${i+1}`,notes:''})),birds:[],eggs:[],breeding:[],hatches:[]});let state;try{const saved=JSON.parse(localStorage.getItem(KEY));state=valid(saved)?saved:defaultState()}catch{state=defaultState()}function valid(x){return x&&Array.isArray(x.pens)&&Array.isArray(x.birds)&&Array.isArray(x.eggs)}state.breeding ||= [];state.hatches ||= [];function save(){localStorage.setItem(KEY,JSON.stringify(state));render();renderHatchOverview()}function el(id){return document.getElementById(id)}function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function penName(id){return state.pens.find(p=>p.id===id)?.name||'Unassigned'}function birdLabel(id){const b=state.birds.find(x=>x.id===id);return b?`${b.name||b.id} (${b.id})`:'Unknown'}
+function treeRender(){const selected=el('familyBird').value,b=state.birds.find(x=>x.id===selected);if(!b){el('familyTree').textContent='Register a bird to see its family tree.';return}const kids=state.birds.filter(x=>x.fatherId===b.id||x.motherId===b.id);const parent=(id)=>id?birdLabel(id):'Not recorded';el('familyTree').innerHTML=`<strong>${safe(birdLabel(b.id))}</strong><p class="muted">${safe(b.breed||'Bloodline not recorded')}</p><div class="fields"><div><strong>Father</strong><p>${safe(parent(b.fatherId))}</p></div><div><strong>Mother</strong><p>${safe(parent(b.motherId))}</p></div></div><strong>Recorded offspring (${kids.length})</strong><div>${kids.map(k=>`<div class="item">${safe(birdLabel(k.id))}</div>`).join('')||'<p class="muted">None recorded yet</p>'}</div>`}
+function refreshFamilySelectors(){for(const id of ['familyBird','childId','fatherId','motherId']){const select=el(id),old=select.value;select.innerHTML=(id==='fatherId'||id==='motherId'?'<option value="">Unknown / not recorded</option>':'<option value="">Choose a bird</option>')+state.birds.map(b=>`<option value="${safe(b.id)}">${safe(birdLabel(b.id))}</option>`).join('');select.value=state.birds.some(b=>b.id===old)?old:''}treeRender()}
+function render(){el('penCount').textContent=state.pens.length;el('birdCount').textContent=state.birds.length;const today=new Date().toLocaleDateString('en-CA');el('eggCount').textContent=state.eggs.filter(x=>x.date===today).reduce((s,x)=>s+Number(x.qty),0);el('penList').innerHTML=state.pens.map(p=>`<div class="item"><strong>${safe(p.name)}</strong><small>${safe(p.notes)} · ${state.birds.filter(b=>b.pen===p.id).length} birds</small></div>`).join('')||'<p>No pens yet.</p>';for(const id of ['birdPen','eggPen','breedingPen']){const prev=el(id).value;el(id).innerHTML='<option value="">Unassigned</option>'+state.pens.map(p=>`<option value="${safe(p.id)}">${safe(p.name)}</option>`).join('');el(id).value=state.pens.some(p=>p.id===prev)?prev:''}el('birdList').innerHTML=state.birds.map(b=>`<div class="item"><strong>${safe(b.id)} · ${safe(b.name||b.type)}</strong><small>${safe(b.type)} · ${safe(b.sex)} · ${safe(b.breed)} · ${safe(penName(b.pen))}</small><div>${safe(b.notes)}</div><div class="actions"><button class="danger" data-delete-bird="${safe(b.id)}">Delete</button></div></div>`).join('')||'<p>No birds recorded yet.</p>';const male=el('breedingMale'),oldMale=male.value;male.innerHTML='<option value="">Not assigned</option>'+state.birds.map(b=>`<option value="${safe(b.id)}">${safe(b.id)} · ${safe(b.name||b.breed)}</option>`).join('');male.value=state.birds.some(b=>b.id===oldMale)?oldMale:'';const group=el('hatchGroup'),oldGroup=group.value;group.innerHTML='<option value="">Unknown / not assigned</option>'+state.breeding.map(g=>`<option value="${safe(g.id)}">${safe(g.name)}</option>`).join('');group.value=state.breeding.some(g=>g.id===oldGroup)?oldGroup:'';el('breedingList').innerHTML=state.breeding.map(g=>`<div class="item"><strong>${safe(g.name)}</strong><small>Male: ${safe(g.male||'Unknown')} · Hens: ${safe(g.females.join(', ')||'Not entered')} · ${safe(penName(g.pen))} · Started ${safe(g.date)}</small><div>${safe(g.notes)}</div><div class="actions"><button class="danger" data-delete-breeding="${safe(g.id)}">Delete</button></div></div>`).join('')||'<p>No breeding groups recorded.</p>';el('hatchList').innerHTML=state.hatches.map(h=>`<div class="item"><strong>${safe(h.id)} · ${safe(h.chicks)} chicks / ${safe(h.eggs)} eggs</strong><small>Set ${safe(h.set)} · Due ${safe(h.due||'Not set')} · Hatched ${safe(h.actual||'Pending')} · ${safe(state.breeding.find(g=>g.id===h.group)?.name||'Unknown group')}</small><div>${safe(h.notes)}</div><div class="actions"><button class="danger" data-delete-hatch="${safe(h.id)}">Delete</button></div></div>`).join('')||'<p>No hatches recorded.</p>';refreshFamilySelectors();el('eggList').innerHTML=[...state.eggs].reverse().map(e=>`<div class="item"><strong>${safe(e.date)} · ${safe(e.qty)} eggs</strong><small>${safe(penName(e.pen))}</small><div>${safe(e.notes)}</div><div class="actions"><button class="danger" data-delete-egg="${safe(e.id)}">Delete</button></div></div>`).join('')||'<p>No egg collections recorded yet.</p>'}document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(x=>x.classList.toggle('hidden',x.id!==b.dataset.tab))}));el('familyBird').addEventListener('change',treeRender);el('childId').addEventListener('change',()=>{const b=state.birds.find(x=>x.id===el('childId').value);el('fatherId').value=b?.fatherId||'';el('motherId').value=b?.motherId||''});el('parentForm').addEventListener('submit',e=>{e.preventDefault();const child=state.birds.find(x=>x.id===el('childId').value),father=el('fatherId').value,mother=el('motherId').value;if(!child)return alert('Select an offspring bird');if(father===child.id||mother===child.id||father&&father===mother)return alert('A bird cannot be its own parent and parents must be different birds.');const reaches=(start,target,seen=new Set())=>{if(!start||seen.has(start))return false;if(start===target)return true;seen.add(start);const b=state.birds.find(x=>x.id===start);return b&&(reaches(b.fatherId,target,seen)||reaches(b.motherId,target,seen))};if(reaches(father,child.id)||reaches(mother,child.id))return alert('This creates a circular family tree.');child.fatherId=father;child.motherId=mother;save();el('familyBird').value=child.id;treeRender();el('parentStatus').textContent='Parentage saved.'});el('penForm').addEventListener('submit',e=>{e.preventDefault();state.pens.push({id:crypto.randomUUID(),name:el('penName').value.trim(),notes:el('penNotes').value.trim()});e.target.reset();save()});el('birdForm').addEventListener('submit',e=>{e.preventDefault();const id=el('birdId').value.trim();if(state.birds.some(b=>b.id.toLowerCase()===id.toLowerCase()))return alert('This Bird ID already exists. Choose a unique ID.');state.birds.push({id,name:el('birdName').value.trim(),type:el('birdType').value,sex:el('birdSex').value,breed:el('birdBreed').value.trim(),pen:el('birdPen').value,notes:el('birdNotes').value.trim()});e.target.reset();save()});el('breedingDate').value=new Date().toLocaleDateString('en-CA');el('breedingForm').addEventListener('submit',e=>{e.preventDefault();const females=el('breedingFemales').value.split(',').map(x=>x.trim()).filter(Boolean);const unknown=females.filter(id=>!state.birds.some(b=>b.id.toLowerCase()===id.toLowerCase()));if(unknown.length)return alert('Register these hen IDs in Birds first: '+unknown.join(', '));state.breeding.push({id:crypto.randomUUID(),name:el('breedingName').value.trim(),male:el('breedingMale').value,females,date:el('breedingDate').value,pen:el('breedingPen').value,notes:el('breedingNotes').value.trim()});e.target.reset();save()});el('hatchForm').addEventListener('submit',e=>{e.preventDefault();const id=el('hatchId').value.trim();if(state.hatches.some(h=>h.id.toLowerCase()===id.toLowerCase()))return alert('Hatch ID already exists');const eggs=Number(el('hatchEggs').value),chicks=Number(el('hatchChicks').value);if(chicks>eggs)return alert('Chicks hatched cannot exceed eggs set');state.hatches.push({id,set:el('hatchSet').value,due:el('hatchDue').value,actual:el('hatchActual').value,eggs,chicks,group:el('hatchGroup').value,species:el('hatchSpecies').value,stage:el('hatchStage').value,notes:el('hatchNotes').value.trim()});e.target.reset();save()});el('eggDate').value=new Date().toLocaleDateString('en-CA');el('eggForm').addEventListener('submit',e=>{e.preventDefault();state.eggs.push({id:crypto.randomUUID(),date:el('eggDate').value,pen:el('eggPen').value,qty:Number(el('eggQty').value),notes:el('eggNotes').value.trim()});e.target.reset();el('eggDate').value=new Date().toLocaleDateString('en-CA');save()});document.addEventListener('click',e=>{const b=e.target.closest('[data-delete-bird],[data-delete-egg],[data-delete-breeding],[data-delete-hatch]');if(!b||!confirm('Delete this record?'))return;if(b.dataset.deleteBird)state.birds=state.birds.filter(x=>x.id!==b.dataset.deleteBird);else if(b.dataset.deleteEgg)state.eggs=state.eggs.filter(x=>x.id!==b.dataset.deleteEgg);else if(b.dataset.deleteBreeding)state.breeding=state.breeding.filter(x=>x.id!==b.dataset.deleteBreeding);else if(b.dataset.deleteHatch)state.hatches=state.hatches.filter(x=>x.id!==b.dataset.deleteHatch);save()});el('exportBtn').addEventListener('click',()=>{const a=document.createElement('a'),blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});a.href=URL.createObjectURL(blob);a.download='flockvault-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});el('importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!valid(data)||!data.pens.every(p=>p&&typeof p.id==='string'&&typeof p.name==='string')||!data.birds.every(b=>b&&typeof b.id==='string')||!data.eggs.every(g=>g&&typeof g.id==='string'))throw Error('Invalid backup structure');if(!confirm('Replace ALL current records with this backup?'))return;state=data;state.breeding ||= [];state.hatches ||= [];save();el('importStatus').textContent='Backup restored successfully.'}catch(err){el('importStatus').textContent='Could not restore: '+err.message}e.target.value=''});render();
+
+// Phase 4 additive extension: preserve the Phase 1-3 storage key and backup format.
+state.losses ||= [];
+const originalRender = render;
+function profileOptions(id,allowBlank=false){const select=el(id),prior=select.value;select.innerHTML=(allowBlank?'<option value="">Choose a bird</option>':'')+state.birds.map(b=>`<option value="${safe(b.id)}">${safe(birdLabel(b.id))}</option>`).join('');if(state.birds.some(b=>b.id===prior))select.value=prior;else if(allowBlank)select.value='';}
+function ancestorHtml(id,depth=0,visited=new Set()){if(!id)return '<span class="muted">Unknown</span>';const b=state.birds.find(x=>x.id===id);if(!b)return `<span class="muted">${safe(id)} (not registered)</span>`;if(visited.has(id))return '<span class="warning">Circular relationship</span>';const next=new Set(visited);next.add(id);return `<div class="history"><strong>${safe(birdLabel(id))}</strong> <span class="muted">${safe(b.breed||'')}</span>${depth<2?`<div class="fields"><div><small>Father</small>${ancestorHtml(b.fatherId,depth+1,next)}</div><div><small>Mother</small>${ancestorHtml(b.motherId,depth+1,next)}</div></div>`:''}</div>`}
+function renderProfile(){const b=state.birds.find(x=>x.id===el('profileBird').value);el('profileForm').querySelector('button').disabled=!b;if(!b){el('profileDetails').textContent='Register a bird to begin.';return}el('profileStatus').value=b.status||'Active';el('profileHatch').value=b.hatchDate||'';el('profileValue').value=b.estimatedValue??'';const related=state.losses.filter(l=>l.birdId===b.id);el('profileDetails').innerHTML=`<div class="profile-grid"><div><strong>${safe(birdLabel(b.id))}</strong><span class="tag">${safe(b.status||'Active')}</span><p>${safe(b.type)} · ${safe(b.sex)} · ${safe(b.breed||'Breed unknown')}</p></div><div><strong>Pen</strong>${safe(penName(b.pen))}<p>Hatched: ${safe(b.hatchDate||'Unknown')}</p></div><div><strong>Estimated value</strong>${b.estimatedValue==null?'Not recorded':'$'+Number(b.estimatedValue).toFixed(2)}</div></div><h3>Pedigree (up to 3 generations)</h3><div class="fields"><div><strong>Father's line</strong>${ancestorHtml(b.fatherId)}</div><div><strong>Mother's line</strong>${ancestorHtml(b.motherId)}</div></div><h3>Recorded offspring</h3>${state.birds.filter(x=>x.fatherId===b.id||x.motherId===b.id).map(x=>`<div class="item">${safe(birdLabel(x.id))}</div>`).join('')||'<p class="muted">None recorded</p>'}<h3>History</h3>${(b.history||[]).map(h=>`<div class="history"><small>${safe(h.date)}</small><div>${safe(h.note)}</div></div>`).join('')||'<p class="muted">No history notes yet</p>'}${related.map(l=>`<div class="history">Loss: ${safe(l.date)} · ${safe(l.cause)}</div>`).join('')}`}
+function renderLosses(){el('lossList').innerHTML=state.losses.map(l=>`<div class="item"><strong>${safe(birdLabel(l.birdId))} · ${safe(l.date)}</strong><small>${safe(l.cause)} · Estimated value: ${l.value==null?'Not recorded':'$'+Number(l.value).toFixed(2)}</small><div>${safe(l.notes)}</div></div>`).join('')||'<p>No losses recorded.</p>'}
+render=function(){originalRender();profileOptions('profileBird');profileOptions('lossBird',true);renderProfile();renderLosses()};
+el('profileBird').addEventListener('change',renderProfile);
+el('profileForm').addEventListener('submit',e=>{e.preventDefault();const b=state.birds.find(x=>x.id===el('profileBird').value);if(!b)return;const id=b.id;b.status=el('profileStatus').value;b.hatchDate=el('profileHatch').value;b.estimatedValue=el('profileValue').value===''?null:Number(el('profileValue').value);const note=el('profileEvent').value.trim();if(note){b.history ||= [];b.history.push({date:new Date().toLocaleDateString('en-CA'),note})}el('profileEvent').value='';save();el('profileBird').value=id;renderProfile();el('profileStatusMsg').textContent='Bird profile saved.'});
+el('lossDate').value=new Date().toLocaleDateString('en-CA');
+el('lossForm').addEventListener('submit',e=>{e.preventDefault();const id=el('lossBird').value,b=state.birds.find(x=>x.id===id);if(!b)return alert('Choose a registered bird.');if(state.losses.some(l=>l.birdId===id))return alert('A loss is already recorded for this bird.');if(!confirm('Mark '+birdLabel(id)+' as deceased and record this loss?'))return;state.losses.push({id:crypto.randomUUID(),birdId:id,date:el('lossDate').value,cause:el('lossCause').value,value:el('lossValue').value===''?null:Number(el('lossValue').value),notes:el('lossNotes').value.trim()});b.status='Deceased';e.target.reset();el('lossDate').value=new Date().toLocaleDateString('en-CA');save();el('lossStatusMsg').textContent='Loss saved and bird marked deceased.'});
+// Refresh Phase 4 views after existing import, deletion, or other saves.
+const phase4Save=save;save=function(){phase4Save();renderProfile();renderLosses()};
+render();
+
+// Phase 5: additive financial records; retain existing storage key and backup JSON.
+function initFinance(){state.sales ||= [];state.expenses ||= []}
+initFinance();
+const dollars=n=>'$'+Number(n||0).toFixed(2);
+const financeSafe=x=>safe(String(x??''));
+function financeOptions(){const s=el('saleBird'),prior=s.value;s.innerHTML='<option value="">Choose a bird (optional)</option>'+state.birds.filter(b=>!['Sold','Deceased'].includes(b.status||'Active')).map(b=>`<option value="${financeSafe(b.id)}">${financeSafe(birdLabel(b.id))}</option>`).join('');if([...s.options].some(o=>o.value===prior))s.value=prior}
+function renderFinance(){initFinance();financeOptions();el('saleList').innerHTML=state.sales.map(x=>`<div class="item"><strong>${financeSafe(x.date)} · ${financeSafe(x.description)} · ${dollars(x.total)}</strong><small>${financeSafe(x.type)} · Qty ${Number(x.quantity)}${x.birdId?' · '+financeSafe(x.birdId):''}${x.customer?' · '+financeSafe(x.customer):''}</small><div>${financeSafe(x.notes)}</div></div>`).join('')||'<p class="muted">No sales recorded.</p>';el('expenseList').innerHTML=state.expenses.map(x=>`<div class="item"><strong>${financeSafe(x.date)} · ${financeSafe(x.description)} · ${dollars(x.amount)}</strong><small>${financeSafe(x.category)}${x.vendor?' · '+financeSafe(x.vendor):''}${x.receipt?' · Receipt: '+financeSafe(x.receipt):''}</small><div>${financeSafe(x.notes)}</div></div>`).join('')||'<p class="muted">No expenses recorded.</p>';const sales=state.sales.reduce((n,x)=>n+Number(x.total),0),expenses=state.expenses.reduce((n,x)=>n+Number(x.amount),0);el('finSales').textContent=dollars(sales);el('finExpenses').textContent=dollars(expenses);el('finNet').textContent=dollars(sales-expenses)}
+const priorFinanceRender=render;
+render=function(){priorFinanceRender();renderFinance()};
+const priorFinanceSave=save;
+save=function(){initFinance();priorFinanceSave()};
+const nowLocal=()=>new Date().toLocaleDateString('en-CA');el('saleDate').value=nowLocal();el('expenseDate').value=nowLocal();
+el('saleType').addEventListener('change',()=>{el('saleBird').disabled=el('saleType').value!=='Bird';if(el('saleBird').disabled)el('saleBird').value=''});
+el('saleForm').addEventListener('submit',e=>{e.preventDefault();const type=el('saleType').value,id=type==='Bird'?el('saleBird').value:'',quantity=Number(el('saleQuantity').value),total=Number(el('saleTotal').value);if(!Number.isInteger(quantity)||quantity<1||!Number.isFinite(total)||total<0)return alert('Enter a valid quantity and sale amount.');if(id){const b=state.birds.find(x=>x.id===id);if(!b||['Sold','Deceased'].includes(b.status||'Active'))return alert('Select an available bird.');if(quantity!==1)return alert('An individual bird sale must have quantity 1. For multiple birds, make separate entries.');if(!confirm('Record sale and mark '+birdLabel(id)+' as Sold?'))return;b.status='Sold';b.history ||= [];b.history.push({date:el('saleDate').value,note:'Sold for '+dollars(total)})}state.sales.push({id:crypto.randomUUID(),date:el('saleDate').value,type, birdId:id,description:el('saleDescription').value.trim(),quantity,total,customer:el('saleCustomer').value.trim(),notes:el('saleNotes').value.trim()});e.target.reset();el('saleDate').value=nowLocal();save();el('saleMessage').textContent='Sale saved.'});
+el('expenseForm').addEventListener('submit',e=>{e.preventDefault();const amount=Number(el('expenseAmount').value);if(!Number.isFinite(amount)||amount<0)return alert('Enter a valid amount.');state.expenses.push({id:crypto.randomUUID(),date:el('expenseDate').value,category:el('expenseCategory').value,description:el('expenseDescription').value.trim(),amount,vendor:el('expenseVendor').value.trim(),receipt:el('expenseReceipt').value.trim(),notes:el('expenseNotes').value.trim()});e.target.reset();el('expenseDate').value=nowLocal();save()});
+function downloadCsv(filename,rows,fields){const quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';const csv=[fields.map(quote).join(','),...rows.map(r=>fields.map(f=>quote(r[f])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+el('exportSales').addEventListener('click',()=>downloadCsv('flockvault-sales.csv',state.sales,['date','type','birdId','description','quantity','total','customer','notes']));
+el('exportExpenses').addEventListener('click',()=>downloadCsv('flockvault-expenses.csv',state.expenses,['date','category','description','amount','vendor','receipt','notes']));
+renderFinance();
+
+// Phase 6: Feed inventory, daily and weekly pen-level usage.
+state.feedPurchases ||= []; state.feedUsage ||= [];
+function feedWeek(date){const d=new Date(date+'T12:00:00');const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function feedSame(a,b){return a.pen===b.pen&&a.name.trim().toLowerCase()===b.name.trim().toLowerCase()&&feedWeek(a.date)===feedWeek(b.date)}
+function feedConflict(candidate){return state.feedUsage.some(u=>feedSame(u,candidate)&&(u.mode==='weekly'||candidate.mode==='weekly'))}
+function feedRates(){const m=new Map();for(const p of state.feedPurchases){const k=p.name.trim().toLowerCase(),v=m.get(k)||{lb:0,cost:0};v.lb+=p.pounds;v.cost+=p.cost;m.set(k,v)}return m}
+function renderFeed(){state.feedPurchases ||= [];state.feedUsage ||= [];const pen=el('fuPen'),old=pen.value;pen.innerHTML='<option value="">Choose pen</option>'+state.pens.map(p=>`<option value="${safe(p.id)}">${safe(p.name)}</option>`).join('');pen.value=state.pens.some(p=>p.id===old)?old:'';const purchased=state.feedPurchases.reduce((s,p)=>s+p.pounds,0),used=state.feedUsage.reduce((s,u)=>s+u.pounds,0),rates=feedRates();el('feedPurchased').textContent=purchased.toFixed(1);el('feedUsed').textContent=used.toFixed(1);el('feedRemaining').textContent=(purchased-used).toFixed(1);el('feedPurchaseList').innerHTML=state.feedPurchases.slice().reverse().map(p=>`<div class="item"><strong>${safe(p.date)} · ${safe(p.name)} · ${p.pounds.toFixed(1)} lb</strong><small>${dollars(p.cost)} · ${safe(p.vendor)}</small></div>`).join('')||'<p class="muted">No feed purchases yet.</p>';el('feedUsageList').innerHTML=state.feedUsage.slice().reverse().map(u=>`<div class="item"><strong>${safe(u.date)} · ${safe(penName(u.pen))} · ${safe(u.name)}</strong><small>${safe(u.mode)} · ${u.pounds.toFixed(2)} lb · ${safe(u.notes)}</small></div>`).join('')||'<p class="muted">No feed usage logged.</p>';el('feedPenSummary').innerHTML=state.pens.map(p=>{const usage=state.feedUsage.filter(u=>u.pen===p.id),lb=usage.reduce((s,u)=>s+u.pounds,0),cost=usage.reduce((s,u)=>{const r=rates.get(u.name.trim().toLowerCase());return s+(r&&r.lb>0?u.pounds*r.cost/r.lb:0)},0),unknown=usage.some(u=>!rates.get(u.name.trim().toLowerCase())?.lb);return `<div class="item"><strong>${safe(p.name)}</strong><small>${lb.toFixed(2)} lb logged · Estimated feed cost ${dollars(cost)}${unknown?' (excludes feeds without purchase prices)':''}</small></div>`}).join('')}
+const previousFeedRender=render;render=function(){previousFeedRender();renderFeed()};
+const previousFeedSave=save;save=function(){state.feedPurchases ||= [];state.feedUsage ||= [];previousFeedSave()};
+el('fpDate').value=nowLocal();el('fuDate').value=nowLocal();
+el('feedPurchaseForm').addEventListener('submit',e=>{e.preventDefault();const bags=Number(el('fpBags').value),weight=Number(el('fpBagWeight').value),cost=Number(el('fpCost').value),name=el('fpName').value.trim();if(!name||![bags,weight,cost].every(Number.isFinite)||bags<=0||weight<=0||cost<0)return alert('Enter a valid feed name, bag count, bag weight, and cost.');state.feedPurchases.push({id:crypto.randomUUID(),date:el('fpDate').value,name,pounds:bags*weight,cost,vendor:el('fpVendor').value.trim()});e.target.reset();el('fpDate').value=nowLocal();save()});
+el('feedUsageForm').addEventListener('submit',e=>{e.preventDefault();const mode=el('fuMode').value,date=el('fuDate').value,pen=el('fuPen').value,name=el('fuName').value.trim(),pounds=Number(el('fuPounds').value);if(!pen||!name||!Number.isFinite(pounds)||pounds<=0)return alert('Choose a pen, feed and valid amount.');const entry={id:crypto.randomUUID(),mode,date,pen,name,pounds,notes:el('fuNotes').value.trim()};if(mode==='weekly'&&date!==feedWeek(date))return alert('For weekly totals, choose the Monday starting that week: '+feedWeek(date));if(feedConflict(entry))return alert('This pen/feed already has a weekly total or daily records for that week. To prevent double-counting, use daily entries OR a weekly total, not both.');state.feedUsage.push(entry);e.target.reset();el('fuDate').value=nowLocal();save();el('feedStatus').textContent='Feed usage saved.'});
+el('feedExport').addEventListener('click',()=>downloadCsv('flockvault-feed-usage.csv',state.feedUsage.map(u=>({...u,penName:penName(u.pen)})),['date','mode','penName','name','pounds','notes']));
+renderFeed();
+
+// Phase 7: additive health records, same browser storage key and JSON backups.
+state.healthRecords ||= [];
+function healthOptions(){const bird=el('healthBird'),pen=el('healthPen'),bv=bird.value,pv=pen.value;bird.innerHTML='<option value="">Choose registered bird</option>'+state.birds.map(b=>`<option value="${safe(b.id)}">${safe(birdLabel(b.id))}</option>`).join('');pen.innerHTML='<option value="">Choose pen</option>'+state.pens.map(p=>`<option value="${safe(p.id)}">${safe(p.name)}</option>`).join('');bird.value=state.birds.some(b=>b.id===bv)?bv:'';pen.value=state.pens.some(p=>p.id===pv)?pv:''}
+function healthScopeChange(){const isPen=el('healthScope').value==='pen';el('healthBirdWrap').classList.toggle('hidden',isPen);el('healthPenWrap').classList.toggle('hidden',!isPen)}
+el('healthScope').addEventListener('change',healthScopeChange);
+function renderHealth(){state.healthRecords ||= [];healthOptions();const today=nowLocal();el('healthCount').textContent=state.healthRecords.length;el('healthDue').textContent=state.healthRecords.filter(h=>h.followup&&h.followup<=today&&!h.followupCompleted&&h.caseStatus!=='closed').length;el('healthList').innerHTML=state.healthRecords.slice().reverse().map(h=>`<div class="item"><strong>${safe(h.date)} · ${safe(h.category)} · ${safe(h.scope==='pen'?penName(h.target):birdLabel(h.target))}</strong><small>${safe(h.symptoms)}</small>${h.medication?`<div>Medication / treatment: ${safe(h.medication)}${h.dose?' · '+safe(h.dose):''}</div>`:''}${h.start||h.end?`<div>Treatment: ${safe(h.start||'unspecified')} to ${safe(h.end||'unspecified')}</div>`:''}${h.egg||h.meat?`<div>Recorded withdrawal end dates: Egg ${safe(h.egg||'not provided')} · Meat ${safe(h.meat||'not provided')}</div>`:''}${h.followup?`<div class="${h.followup<=today&&!h.followupCompleted&&h.caseStatus!=='closed'?'warning':''}">Follow-up: ${safe(h.followup)}${h.followupCompleted?' (completed)':h.caseStatus==='closed'?' (case closed)':''}</div>`:''}<div>${safe(h.notes)}</div></div>`).join('')||'<p class="muted">No health records yet.</p>'}
+const beforeHealthSave=save;save=function(){state.healthRecords ||= [];beforeHealthSave();renderHealth()};
+const beforeHealthRender=render;render=function(){beforeHealthRender();renderHealth()};
+el('healthDate').value=nowLocal();healthScopeChange();
+el('healthForm').addEventListener('submit',e=>{e.preventDefault();const scope=el('healthScope').value,target=el(scope==='pen'?'healthPen':'healthBird').value;if(!target)return alert('Choose a registered bird or pen.');const start=el('healthStart').value,end=el('healthEnd').value;if(start&&end&&end<start)return alert('Treatment end cannot be before treatment start.');const record={id:crypto.randomUUID(),date:el('healthDate').value,scope,target,category:el('healthCategory').value,symptoms:el('healthSymptoms').value.trim(),medication:el('healthMedication').value.trim(),dose:el('healthDose').value.trim(),start,end,egg:el('healthEgg').value,meat:el('healthMeat').value,followup:el('healthFollowup').value,notes:el('healthNotes').value.trim()};state.healthRecords.push(record);e.target.reset();el('healthDate').value=nowLocal();healthScopeChange();save();el('healthStatus').textContent='Health record saved.'});
+el('healthExport').addEventListener('click',()=>downloadCsv('flockvault-health-records.csv',state.healthRecords.map(h=>({...h,subject:h.scope==='pen'?penName(h.target):birdLabel(h.target)})),['date','scope','subject','category','symptoms','medication','dose','start','end','egg','meat','followup','notes']));
+renderHealth();
+
+// Phase 8: Farm calendar, broody tracking and recurring chores.
+state.broodyRecords ||= [];state.farmTasks ||= [];state.taskHistory ||= [];
+function addDays(iso,n){if(!iso)return '';const d=new Date(iso+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function calInit(){el('calMonth').value=nowLocal().slice(0,7);el('broodyStart').value=nowLocal();el('broodyDue').value=addDays(nowLocal(),21);el('taskDate').value=nowLocal()}
+function renderCalendar(){state.broodyRecords ||= [];state.farmTasks ||= [];const m=el('calMonth').value||nowLocal().slice(0,7),today=nowLocal();el('calDue').textContent=state.farmTasks.filter(t=>!t.done&&t.date<=today).length;el('calBroody').textContent=state.broodyRecords.length;
+const bsel=el('broodyBird'),bv=bsel.value;bsel.innerHTML='<option value="">Choose a hen</option>'+state.birds.filter(b=>b.sex==='Female'||b.sex==='Hen'||b.sex==='Unknown').map(b=>`<option value="${safe(b.id)}">${safe(birdLabel(b.id))}</option>`).join('');bsel.value=state.birds.some(b=>b.id===bv)?bv:'';
+const psel=el('taskPen'),pv=psel.value;psel.innerHTML='<option value="">All farm / no pen</option>'+state.pens.map(p=>`<option value="${safe(p.id)}">${safe(p.name)}</option>`).join('');psel.value=state.pens.some(p=>p.id===pv)?pv:'';
+el('broodyList').innerHTML=state.broodyRecords.slice().reverse().map(b=>`<div class="item"><strong>${safe(birdLabel(b.bird))} · Due ${safe(b.due)}</strong><small>Started ${safe(b.start)} · ${safe(b.eggs)} eggs</small><div>${safe(b.notes)}</div><button class="danger" data-del-broody="${safe(b.id)}">Delete</button></div>`).join('')||'<p class="muted">No broody hens recorded yet.</p>';
+el('taskList').innerHTML=state.farmTasks.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(t=>`<div class="item"><strong>${safe(t.title)} ${t.done?'✅ DONE':''}</strong><small>${safe(t.date)} · ${safe(t.pen?penName(t.pen):'Farm-wide')} · ${safe(t.repeat)}</small>${t.lastCompleted?`<div style="color:#2c7b4c;font-weight:700">✓ Last completed ${safe(t.lastCompleted)}${!t.done?' · Next due '+safe(t.date):''}</div>`:''}<div>${safe(t.notes)}</div><div class="actions"><button data-done-task="${safe(t.id)}">${t.done?'Reopen':'✓ Mark done'}</button><button class="danger" data-del-task="${safe(t.id)}">Delete</button></div></div>`).join('')||'<p class="muted">No tasks yet.</p>';
+const recent=state.taskHistory.slice(-12).reverse();el('taskList').insertAdjacentHTML('beforeend',`<h3>✅ Recently completed chores</h3>`+(recent.map(h=>`<div class="item"><strong>✓ ${safe(h.title)}</strong><small>Completed ${safe(h.completed)} · ${safe(h.pen?penName(h.pen):'Farm-wide')}</small></div>`).join('')||'<p class="muted">No completed chores yet.</p>'));
+const events=[];state.hatches.forEach(h=>{if(h.due)events.push({date:h.due,label:'🐣 Hatch due: '+h.id});});state.healthRecords.forEach(h=>{if(h.followup&&!h.followupCompleted&&h.caseStatus!=='closed')events.push({date:h.followup,label:'🩺 Health follow-up: '+(h.scope==='pen'?penName(h.target):birdLabel(h.target))});});state.broodyRecords.forEach(b=>events.push({date:b.due,label:'🥚 Broody hatch due: '+birdLabel(b.bird)}));state.farmTasks.filter(t=>!t.done).forEach(t=>events.push({date:t.date,label:'🧹 '+t.title}));const shown=events.filter(e=>e.date.startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date));el('calEvents').innerHTML=shown.map(e=>`<div class="item"><strong>${safe(e.date)} ${e.date<today?'⚠️':''}</strong>${safe(e.label)}</div>`).join('')||'<p class="muted">No events in this month. Choose another month to look ahead.</p>';
+}
+el('broodyStart').addEventListener('change',()=>{el('broodyDue').value=addDays(el('broodyStart').value,21)});
+el('broodyForm').addEventListener('submit',e=>{e.preventDefault();const bird=el('broodyBird').value;if(!bird)return alert('Select a registered hen first.');state.broodyRecords.push({id:crypto.randomUUID(),bird,start:el('broodyStart').value,due:el('broodyDue').value,eggs:Number(el('broodyEggs').value)||0,notes:el('broodyNotes').value.trim()});e.target.reset();el('broodyStart').value=nowLocal();el('broodyDue').value=addDays(nowLocal(),21);save();renderCalendar()});
+el('taskForm').addEventListener('submit',e=>{e.preventDefault();state.farmTasks.push({id:crypto.randomUUID(),title:el('taskTitle').value.trim(),date:el('taskDate').value,pen:el('taskPen').value,repeat:el('taskRepeat').value,notes:el('taskNotes').value.trim(),done:false});e.target.reset();el('taskDate').value=nowLocal();save();renderCalendar()});
+el('calMonth').addEventListener('change',renderCalendar);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-done-task],[data-del-task],[data-del-broody]');if(!b)return;if(b.dataset.doneTask){const t=state.farmTasks.find(x=>x.id===b.dataset.doneTask);if(!t)return;if(!t.done){const completed=nowLocal();state.taskHistory ||= [];state.taskHistory.push({id:crypto.randomUUID(),taskId:t.id,title:t.title,pen:t.pen,scheduled:t.date,completed});t.lastCompleted=completed;if(t.repeat!=='none'){const interval=t.repeat==='daily'?1:7;let next=addDays(t.date,interval);while(next<=completed)next=addDays(next,interval);t.date=next;t.done=false;}else{t.done=true;}}else{t.done=false;}}else if(b.dataset.delTask){if(!confirm('Delete this task?'))return;state.farmTasks=state.farmTasks.filter(x=>x.id!==b.dataset.delTask)}else if(b.dataset.delBroody){if(!confirm('Delete this broody record?'))return;state.broodyRecords=state.broodyRecords.filter(x=>x.id!==b.dataset.delBroody)}save();renderCalendar();renderOperations()});
+// Refresh calendar when any section is opened or data changes.
+document.querySelector('[data-tab="calendar"]').addEventListener('click',renderCalendar);
+calInit();renderCalendar();
+
+// Phase 9: Both views use the existing farmTasks and taskHistory arrays.
+let operationsView='pen';
+function renderOperations(){
+ state.farmTasks ||= [];state.taskHistory ||= [];
+ const today=nowLocal(),open=state.farmTasks.filter(t=>!t.done),due=open.filter(t=>t.date<=today),upcoming=open.filter(t=>t.date>today);
+ el('opsDue').textContent=due.length;el('opsUpcoming').textContent=upcoming.length;
+ const completed=state.taskHistory.filter(h=>h.completed===today);
+ el('opsCompleted').textContent=completed.length;
+ const pen=el('opsPen'),old=pen.value;
+ pen.innerHTML='<option value="">Farm-wide</option>'+state.pens.map(p=>`<option value="${safe(p.id)}">${safe(p.name)}</option>`).join('');
+ pen.value=state.pens.some(p=>p.id===old)?old:'';
+ el('opsPenView').classList.toggle('selected',operationsView==='pen');el('opsTaskView').classList.toggle('selected',operationsView==='task');
+ el('opsPenView').setAttribute('aria-pressed',String(operationsView==='pen'));el('opsTaskView').setAttribute('aria-pressed',String(operationsView==='task'));
+ const groups=new Map();
+ if(operationsView==='pen'){
+  state.pens.forEach(p=>groups.set(p.id,{name:p.name,tasks:[]}));groups.set('',{name:'🌾 Farm-wide',tasks:[]});
+  open.forEach(t=>{if(!groups.has(t.pen))groups.set(t.pen,{name:'Unassigned pen',tasks:[]});groups.get(t.pen).tasks.push(t)});
+ }else{
+  open.forEach(t=>{const key=t.title.trim().toLowerCase();if(!groups.has(key))groups.set(key,{name:t.title,tasks:[]});groups.get(key).tasks.push(t)});
+ }
+ const taskHTML=t=>`<div class="ops-task"><div><strong>${safe(t.title)}</strong><small>${safe(penName(t.pen))}${!t.pen?' / Farm-wide':''} · Due ${safe(t.date)} ${t.date<today?'⚠️ Overdue':t.date===today?'• Today':''} · ${safe(t.repeat||'none')}</small></div><button type="button" data-done-task="${safe(t.id)}">✓ Mark done</button></div>`;
+ el('opsGroups').innerHTML=[...groups.values()].map(g=>`<div class="ops-group"><h3>${safe(g.name)} <span class="ops-count">(${g.tasks.length} open)</span></h3>${g.tasks.length?g.tasks.sort((a,b)=>a.date.localeCompare(b.date)).map(taskHTML).join(''):'<div class="ops-empty">All caught up ✓</div>'}</div>`).join('')||'<p class="ops-empty">No chores yet. Add your first chore above.</p>';
+ el('opsHistory').innerHTML=completed.slice().reverse().map(h=>`<div class="item"><strong>✓ ${safe(h.title)}</strong><small>${safe(h.pen?penName(h.pen):'Farm-wide')} · ${safe(h.completed)}</small></div>`).join('')||'<p class="muted">Nothing completed today yet.</p>';
+}
+el('opsPenView').addEventListener('click',()=>{operationsView='pen';renderOperations()});
+el('opsTaskView').addEventListener('click',()=>{operationsView='task';renderOperations()});
+el('opsDate').value=nowLocal();
+el('opsQuickForm').addEventListener('submit',e=>{e.preventDefault();const title=el('opsTitle').value.trim();if(!title)return;state.farmTasks.push({id:crypto.randomUUID(),title,date:el('opsDate').value,pen:el('opsPen').value,repeat:el('opsRepeat').value,notes:'',done:false});el('opsTitle').value='';save();renderCalendar();renderOperations()});
+document.querySelector('[data-tab="operations"]').addEventListener('click',renderOperations);
+renderOperations();
+
+// Phase 10 mobile navigation: reuse existing tab clicks and the same storage key.
+const mobileSection=document.getElementById('mobileSection');
+const sectionButtons=[...document.querySelectorAll('nav.tabs [data-tab]')];
+mobileSection.innerHTML=sectionButtons.map(b=>'<option value="'+b.dataset.tab+'">'+b.textContent.trim()+'</option>').join('');
+function phase10OpenSection(id){
+ const button=sectionButtons.find(b=>b.dataset.tab===id);
+ if(!button)return;
+ button.click();
+ mobileSection.value=id;
+ if(window.matchMedia('(max-width:700px)').matches)window.scrollTo({top:0,behavior:'auto'});
+}
+mobileSection.addEventListener('change',()=>phase10OpenSection(mobileSection.value));
+document.querySelectorAll('[data-mobile-go]').forEach(b=>b.addEventListener('click',()=>phase10OpenSection(b.dataset.mobileGo)));
+sectionButtons.forEach(b=>b.addEventListener('click',()=>{mobileSection.value=b.dataset.tab}));
+mobileSection.value='dashboard';
+
+// Phase 11 installable web app support. Hosting on HTTPS or localhost is required.
+if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(err=>console.warn('Offline setup unavailable:',err)));
+}
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);let cloudClient=null;
+const show=(msg,bad=false)=>{$('cloudStatus').textContent=msg;$('cloudStatus').style.color=bad?'#a32b22':'#294b39'};
+let saved={};try{saved=JSON.parse(localStorage.getItem('fv_beta_connection')||'{}')}catch{}
+$('cloudUrl').value=saved.url||'';$('cloudKey').value=saved.key||'';
+function connect(){let url=$('cloudUrl').value.trim().replace(/\/+$/,'');let key=$('cloudKey').value.trim();if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url))throw Error('Use your base Supabase Project URL, without /rest/v1.');if(!(key.startsWith('sb_publishable_')||key.startsWith('eyJ')))throw Error('Use a publishable key, never a secret key.');if(!window.supabase?.createClient)throw Error('Supabase library did not load. Connect to the internet.');cloudClient=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});localStorage.setItem('fv_beta_connection',JSON.stringify({url,key}));return cloudClient}
+async function check(){const c=cloudClient||connect();const {data:{user},error:authErr}=await c.auth.getUser();if(authErr)throw authErr;if(!user)throw Error('Please sign in first.');const {data,error}=await c.from('farm_members').select('farm_id,role,farms(id,name)').eq('user_id',user.id);if(error)throw error;const farms=data||[];$('cloudFarms').replaceChildren();if(!farms.length){show('Signed in, but no farm membership was found. Do not create another farm yet.');return}for(const f of farms){const d=document.createElement('div');d.className='item';const strong=document.createElement('strong');strong.textContent=(f.farms?.name||'Unnamed farm')+' | Role: '+f.role;d.append(strong);const small=document.createElement('small');small.textContent='Farm ID: '+f.farm_id;d.append(small);$('cloudFarms').append(d)}show('Connected to Supabase as '+user.email+'. '+farms.length+' farm(s) found. Your local farm records have not been changed.');}
+$('cloudConnect').onclick=async()=>{try{const c=connect();const email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password)throw Error('Enter your existing beta email and password.');show('Signing in...');const {error}=await c.auth.signInWithPassword({email,password});if(error)throw error;$('cloudPassword').value='';await check()}catch(e){show(e.message,true)}};
+$('cloudCheck').onclick=async()=>{try{show('Checking farm access...');await check()}catch(e){show(e.message,true)}};
+$('cloudSignOut').onclick=async()=>{try{const c=cloudClient||connect();const {error}=await c.auth.signOut();if(error)throw error;$('cloudFarms').replaceChildren();show('Signed out of the cloud. Local records remain unchanged.')}catch(e){show(e.message,true)}};
+
+// Phase 16: opt-in, isolated cloud write/read test. Does not touch the farm's local state.
+const testStatus=(message,error=false)=>{const node=$('cloudTestStatus');node.textContent=message;node.style.color=error?'#a32b22':'#294b39'};
+async function testFarmContext(){
+ const c=cloudClient||connect();
+ const {data:{user},error:authError}=await c.auth.getUser();
+ if(authError)throw authError;
+ if(!user)throw Error('Please connect and sign in above first.');
+ const {data:members,error:memberError}=await c.from('farm_members').select('farm_id,role,farms(name)').eq('user_id',user.id);
+ if(memberError)throw memberError;
+ const owned=(members||[]).filter(x=>x.role==='owner');
+ if(owned.length!==1)throw Error('Expected exactly one farm where you are owner. Found '+owned.length+'. Contact support before saving.');
+ return {c,user,farm:owned[0]};
+}
+$('cloudTestSave').onclick=async()=>{
+ const button=$('cloudTestSave');button.disabled=true;
+ try{
+  const {c,user,farm}=await testFarmContext();
+  if(!confirm('Save ONE harmless test record to the cloud for '+(farm.farms?.name||'your farm')+'? No bird, finance, or local records will be uploaded.'))return;
+  testStatus('Saving a test record...');
+  const payload={test:true,description:'Phase 16 connectivity test only',created_by:user.id};
+  const {data,error}=await c.from('flockvault_cloud_tests').insert({farm_id:farm.farm_id,user_id:user.id,payload}).select('id,created_at').single();
+  if(error)throw error;
+  testStatus('Success! Cloud saved a test record at '+new Date(data.created_at).toLocaleString()+'. Now click Verify saved test records.');
+ }catch(e){testStatus('Cloud test failed: '+e.message+'\nIf the table does not exist, run Phase16-Cloud-Test-Setup.sql in Supabase SQL Editor first.',true)}finally{button.disabled=false}
+};
+$('cloudTestRead').onclick=async()=>{
+ const button=$('cloudTestRead');button.disabled=true;
+ try{
+  const {c,farm}=await testFarmContext();testStatus('Reading cloud test records...');
+  const {data,error}=await c.from('flockvault_cloud_tests').select('id,created_at,payload').eq('farm_id',farm.farm_id).order('created_at',{ascending:false}).limit(10);
+  if(error)throw error;
+  $('cloudTestResults').replaceChildren();
+  for(const item of data||[]){const div=document.createElement('div');div.className='item';div.textContent='☁️ '+new Date(item.created_at).toLocaleString()+' | '+(item.payload?.description||'Test record');$('cloudTestResults').append(div)}
+  testStatus((data||[]).length+' cloud test record(s) found. Local farm records were not changed.');
+ }catch(e){testStatus('Could not verify cloud test: '+e.message,true)}finally{button.disabled=false}
+};
+
+
+// Phase 17: Manual append-only cloud upload of local birds and pens.
+// Original local IDs are kept inside payload to support repeat-safe previews.
+let inventoryPlan=null;
+const inventoryStatus=(message,error=false)=>{const n=$('cloudInventoryStatus');n.textContent=message;n.style.color=error?'#a32b22':'#294b39'};
+const inventoryResult=$('cloudInventoryResults');
+function localInventory(){
+ const raw=localStorage.getItem('flockvault-phase1-v1');
+ if(!raw)throw Error('No local FlockVault storage found in this browser. Do not upload. Open the browser with your real records.');
+ let data;try{data=JSON.parse(raw)}catch{throw Error('Local farm data could not be read. Keep your backup safe.');}
+ if(!data||!Array.isArray(data.birds)||!Array.isArray(data.pens))throw Error('Local data is missing birds or pens. Do not upload.');
+ const entries=[];
+ for(const [type,items] of [['pen',data.pens],['bird',data.birds]]){
+  const ids=new Set();
+  for(const item of items){
+   if(!item||typeof item!=='object'||Array.isArray(item)||typeof item.id!=='string'||!item.id.trim())throw Error('One '+type+' has no usable ID. Do not upload.');
+   if(ids.has(item.id))throw Error('Duplicate local '+type+' ID '+item.id+'. Do not upload.');
+   ids.add(item.id);
+   entries.push({record_type:type,payload:{...item,_flockvault_source_id:item.id,_flockvault_import:'phase17-local-upload'}});
+  }
+ }
+ return entries;
+}
+async function cloudInventory(){
+ const {c,user,farm}=await testFarmContext();
+ const {data,error}=await c.from('farm_records').select('id,record_type,payload').eq('farm_id',farm.farm_id).in('record_type',['bird','pen']).limit(1000);
+ if(error)throw error;
+ if((data||[]).length===1000)throw Error('At least 1000 cloud records found. This version cannot safely check all duplicates. Stop and contact support.');
+ return {c,user,farm,records:data||[]};
+}
+function inventoryKey(type,id){return JSON.stringify([type,id])}
+async function prepareInventory(){
+ const local=localInventory();
+ const cloud=await cloudInventory();
+ const known=new Set();
+ for(const rec of cloud.records){const id=rec.payload?._flockvault_source_id??rec.payload?.id;if(typeof id==='string')known.add(inventoryKey(rec.record_type,id));}
+ const missing=local.filter(x=>!known.has(inventoryKey(x.record_type,x.payload._flockvault_source_id)));
+ const by=(items,type)=>items.filter(x=>x.record_type===type).length;
+ return {...cloud,local,missing,summary:`LOCAL: ${by(local,'bird')} birds, ${by(local,'pen')} pens.\nALREADY IN CLOUD: ${by(cloud.records,'bird')} birds, ${by(cloud.records,'pen')} pens.\nNEW TO UPLOAD: ${by(missing,'bird')} birds, ${by(missing,'pen')} pens.`};
+}
+$('cloudInventoryPreview').onclick=async()=>{
+ inventoryPlan=null;$('cloudInventoryUpload').disabled=true;inventoryResult.replaceChildren();
+ try{inventoryStatus('Checking local and cloud records...');const plan=await prepareInventory();inventoryPlan=plan;
+  inventoryStatus(plan.summary+'\nReview these numbers carefully before uploading.');
+  const note=document.createElement('p');note.textContent=plan.missing.length?'This will add '+plan.missing.length+' new records to the cloud, without editing existing ones.':'No missing records found. Nothing needs uploading.';inventoryResult.append(note);
+  $('cloudInventoryUpload').disabled=!plan.missing.length;
+ }catch(e){inventoryStatus('Preview stopped: '+e.message,true)}
+};
+$('cloudInventoryUpload').onclick=async()=>{
+ const button=$('cloudInventoryUpload');button.disabled=true;
+ try{
+  if(!inventoryPlan)throw Error('Run Preview first.');
+  const fresh=await prepareInventory();
+  if(fresh.farm.farm_id!==inventoryPlan.farm.farm_id||JSON.stringify(fresh.local)!==JSON.stringify(inventoryPlan.local)||JSON.stringify(fresh.missing.map(x=>inventoryKey(x.record_type,x.payload._flockvault_source_id)))!==JSON.stringify(inventoryPlan.missing.map(x=>inventoryKey(x.record_type,x.payload._flockvault_source_id))))throw Error('Local or cloud records changed since Preview. Run Preview again.');
+  if(!fresh.missing.length){inventoryStatus('No missing records. Nothing uploaded.');return}
+  if(!confirm('Upload '+fresh.missing.length+' missing bird/pen records to '+(fresh.farm.farms?.name||'your farm')+'?\n\n'+fresh.summary+'\n\nThis does NOT change your local records.')){inventoryStatus('Upload cancelled. No changes made.');return}
+  inventoryStatus('Uploading missing records, one at a time...');let count=0;
+  for(const rec of fresh.missing){const {error}=await fresh.c.from('farm_records').insert({farm_id:fresh.farm.farm_id,record_type:rec.record_type,payload:rec.payload,created_by:fresh.user.id});if(error)throw Error('Stopped after '+count+' records: '+error.message);count++;}
+  inventoryStatus('Uploaded '+count+' records successfully. Click Verify cloud counts. Your local records were not changed.');
+ }catch(e){inventoryStatus('Upload stopped: '+e.message+'\nSome records may already have uploaded. Run Preview again before retrying.',true)}finally{inventoryPlan=null;}
+};
+$('cloudInventoryVerify').onclick=async()=>{
+ inventoryPlan=null;$('cloudInventoryUpload').disabled=true;
+ try{inventoryStatus('Verifying cloud records...');const plan=await prepareInventory();inventoryStatus('Cloud check complete.\n'+plan.summary+'\nMissing local records: '+plan.missing.length+'. No local records were changed.');}
+ catch(e){inventoryStatus('Verification failed: '+e.message,true)}
+};
+
+
+// Phase 18: Read-only cloud preview and optional add-missing local import.
+// Cloud rows are never edited; matching local IDs are never overwritten.
+let downloadPlan=null;
+const downloadStatus=(message,error=false)=>{const n=$('cloudDownloadStatus');n.textContent=message;n.style.color=error?'#a32b22':'#294b39'};
+function downloadFile(name,obj){
+ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+function currentLocalData(){
+ const raw=localStorage.getItem('flockvault-phase1-v1');
+ // A fresh browser has no saved state. Treat it as genuinely empty, not as
+ // the app's 10 default display pens, so cloud IDs can be restored safely.
+ if(!raw)return {raw:null,data:{pens:[],birds:[],eggs:[],breeding:[],hatches:[]}};
+ let data;try{data=JSON.parse(raw)}catch{throw Error('Local farm data cannot be parsed. Do not import.');}
+ if(!data||!Array.isArray(data.birds)||!Array.isArray(data.pens))throw Error('Local farm data has invalid birds or pens arrays.');
+ return {raw,data};
+}
+function normalizedCloudItem(row){
+ if(!row||!['bird','pen'].includes(row.record_type)||!row.payload||typeof row.payload!=='object'||Array.isArray(row.payload))throw Error('Unexpected cloud record structure.');
+ const id=row.payload._flockvault_source_id??row.payload.id;
+ if(typeof id!=='string'||!id.trim()||row.payload.id!==id)throw Error('A cloud record has mismatched or missing source IDs. Import stopped.');
+ const item={...row.payload};delete item._flockvault_source_id;delete item._flockvault_import;
+ if(row.record_type==='pen'&&typeof item.name!=='string')throw Error('A cloud pen has an invalid name.');
+ return {type:row.record_type,id,item};
+}
+function sameData(a,b){return JSON.stringify(a,Object.keys(a).sort())===JSON.stringify(b,Object.keys(b).sort())}
+async function prepareDownload(){
+ const cloud=await cloudInventory();
+ const {raw,data}=currentLocalData();
+ const localMap=new Map();
+ for(const [type,items] of [['pen',data.pens],['bird',data.birds]])for(const item of items){
+  if(!item||typeof item.id!=='string'||!item.id.trim())throw Error('Invalid local '+type+' ID.');
+  const key=inventoryKey(type,item.id);if(localMap.has(key))throw Error('Duplicate local '+type+' ID '+item.id);localMap.set(key,item);
+ }
+ const seen=new Set(),missing=[],conflicts=[],matching=[],records=[];
+ for(const row of cloud.records){
+  const record=normalizedCloudItem(row),key=inventoryKey(record.type,record.id);
+  if(seen.has(key))throw Error('Duplicate cloud '+record.type+' ID '+record.id+'. Do not import.');
+  seen.add(key);records.push(record);
+  const existing=localMap.get(key);
+  if(!existing)missing.push(record);
+  else if(sameData(existing,record.item))matching.push(record);
+  else conflicts.push(record);
+ }
+ return {cloud,raw,records,missing,matching,conflicts,summary:'CLOUD: '+records.filter(x=>x.type==='bird').length+' birds, '+records.filter(x=>x.type==='pen').length+' pens.\nLOCAL: '+data.birds.length+' birds, '+data.pens.length+' pens.\nMISSING HERE: '+missing.filter(x=>x.type==='bird').length+' birds, '+missing.filter(x=>x.type==='pen').length+' pens.\nSAME IDs, DIFFERENT CONTENT: '+conflicts.length+' (will NOT overwrite).'};
+}
+function clearDownloadPlan(){downloadPlan=null;$('cloudDownloadExport').disabled=true;$('cloudDownloadImport').disabled=true;}
+$('cloudDownloadPreview').onclick=async()=>{
+ clearDownloadPlan();$('cloudDownloadResults').replaceChildren();
+ try{downloadStatus('Reading cloud birds and pens...');const plan=await prepareDownload();downloadPlan=plan;
+  downloadStatus(plan.summary+'\nReview before downloading or importing.');
+  $('cloudDownloadExport').disabled=!plan.records.length;
+  $('cloudDownloadImport').disabled=!plan.missing.length;
+  const note=document.createElement('p');note.textContent=plan.conflicts.length?'WARNING: '+plan.conflicts.length+' ID conflicts detected. These will be skipped, not overwritten.':'No conflicting IDs detected.';$('cloudDownloadResults').append(note);
+ }catch(e){downloadStatus('Preview stopped: '+e.message,true)}
+};
+$('cloudDownloadExport').onclick=()=>{
+ try{if(!downloadPlan)throw Error('Run preview first.');
+  downloadFile('flockvault-cloud-birds-pens-'+new Date().toISOString().slice(0,10)+'.json',{
+   format:'flockvault-cloud-birds-pens-v1',farm_id:downloadPlan.cloud.farm.farm_id,exported_at:new Date().toISOString(),
+   birds:downloadPlan.records.filter(x=>x.type==='bird').map(x=>x.item),pens:downloadPlan.records.filter(x=>x.type==='pen').map(x=>x.item)});
+  downloadStatus('Cloud JSON download started. This is a birds-and-pens export, NOT a full farm backup.\n'+downloadPlan.summary);
+ }catch(e){downloadStatus('Download failed: '+e.message,true)}
+};
+$('cloudDownloadImport').onclick=async()=>{
+ const btn=$('cloudDownloadImport');btn.disabled=true;
+ try{
+  if(!downloadPlan)throw Error('Run Preview first.');
+  const fresh=await prepareDownload();
+  const fingerprint=p=>JSON.stringify({farm:p.cloud.farm.farm_id,raw:p.raw,records:p.records});
+  if(fingerprint(fresh)!==fingerprint(downloadPlan))throw Error('Cloud or local records changed since Preview. Run Preview again.');
+  if(!fresh.missing.length){downloadStatus('No missing records to import.');return;}
+  if(!confirm('Add '+fresh.missing.length+' missing cloud bird/pen records to THIS browser?\n\n'+fresh.summary+'\n\nExisting IDs will NOT be overwritten. A local JSON backup download will start first.')){
+   downloadStatus('Import cancelled. Nothing changed.');return;
+  }
+  const {data}=currentLocalData();
+  downloadFile('flockvault-before-phase19-import-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json',data);
+  // No edits until all cloud rows and local data are validated.
+  const updated=structuredClone(data);
+  for(const r of fresh.missing)updated[r.type==='bird'?'birds':'pens'].push(r.item);
+  if(!confirm('IMPORTANT: Save the backup file that just downloaded.\n\nClick OK only AFTER you have saved it. Then add '+fresh.missing.length+' missing records and reload FlockVault.')){
+   downloadStatus('Import cancelled. Backup was downloaded; local records unchanged.');return;
+  }
+  localStorage.setItem('flockvault-phase1-v1',JSON.stringify(updated));
+  downloadStatus('Added '+fresh.missing.length+' missing records. Reloading to show them...');
+  location.reload();
+ }catch(e){downloadStatus('Import stopped: '+e.message,true);clearDownloadPlan()}finally{btn.disabled=!downloadPlan||!downloadPlan.missing.length}
+};
+
+})();
+
+// Phase 20: hatch planner, intentionally local-only; older hatch records remain compatible.
+function renderHatchOverview(){
+ const root=document.getElementById('hatchOverview');if(!root)return;
+ const rows=(state.hatches||[]).slice().sort((a,b)=>(a.due||a.set||'').localeCompare(b.due||b.set||''));
+ const today=new Date().toLocaleDateString('en-CA');
+ root.innerHTML=rows.map(h=>{
+  const eggs=Number(h.eggs)||0,chicks=Number(h.chicks)||0;
+  const rate=eggs>0?(100*chicks/eggs).toFixed(1)+'%':'Not available';
+  const stage=h.stage||(h.actual?'Completed':'Unspecified');
+  const due=h.due||'Not set';
+  const dueNote=!h.actual&&h.due&&h.due<today?' · Due date passed (check status)':'';
+  return `<div class="item"><strong>${safe(h.id)} · ${safe(h.species||'Species not recorded')}</strong><small>${safe(stage)} · Due ${safe(due)}${safe(dueNote)}</small><div>${chicks} hatched / ${eggs} set · Hatch rate ${rate}</div><div>${safe(state.breeding.find(g=>g.id===h.group)?.name||'No breeding group linked')}</div></div>`;
+ }).join('')||'<p>No hatches yet. Use the planner above and record your first hatch below.</p>';
+}
+(function initIncubationPlanner(){
+ const species=el('incSpecies'),days=el('incDays'),set=el('incSet'),result=el('incResult');
+ set.value=new Date().toLocaleDateString('en-CA');
+ species.addEventListener('change',()=>{if(species.value!=='custom')days.value=species.value;});
+ function calculate(){const n=Number(days.value);if(!set.value||!Number.isInteger(n)||n<1||n>70){result.textContent='Choose a valid set date and duration (1–70 days).';return null;}const due=addDays(set.value,n);result.textContent='Estimated hatch date: '+due+' ('+n+' days after setting).';return due;}
+ el('incCalculate').addEventListener('click',calculate);
+ el('incApply').addEventListener('click',()=>{const due=calculate();if(!due)return;el('hatchSet').value=set.value;el('hatchDue').value=due;const mapping={'21':'Chicken','28':'Duck','35':'Muscovy','18':'Quail'};el('hatchSpecies').value=species.selectedIndex===3?'Goose':species.selectedIndex===4?'Turkey':species.selectedIndex===5?'Quail':mapping[species.value]||'Other';result.textContent+=' Dates copied to the hatch form below. Remember to save the hatch record.';});
+ renderHatchOverview();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const byId=id=>document.getElementById(id);
+function option(id,label){return '<option value="'+safe(id)+'">'+safe(label)+'</option>';}
+function fill(id,items,empty){
+ const node=byId(id),old=node.value;
+ node.innerHTML=option('',empty)+items.map(x=>option(x.id,x.label)).join('');
+ if(items.some(x=>x.id===old))node.value=old;
+}
+function refresh21(){
+ fill('p21Chick',state.birds.map(b=>({id:b.id,label:(b.name||b.id)+' ('+b.id+')'})),'Choose registered offspring');
+ fill('p21Hatch',state.hatches.map(h=>({id:h.id,label:h.id+' · '+(h.set||'date unknown')})),'Hatch unknown');
+ fill('p21Group',state.breeding.map(g=>({id:g.id,label:g.name})),'Breeding group unknown');
+ show21();
+}
+function show21(){
+ const id=byId('p21Chick').value,b=state.birds.find(x=>x.id===id);
+ if(!b){byId('p21Summary').innerHTML='<p class="muted">Select a registered bird to see its connections.</p>';return;}
+ byId('p21Hatch').value=state.hatches.some(x=>x.id===b.sourceHatchId)?b.sourceHatchId:'';
+ byId('p21Group').value=state.breeding.some(x=>x.id===b.sourceBreedingId)?b.sourceBreedingId:'';
+ const siblings=state.birds.filter(x=>x.id!==b.id&&((b.fatherId&&x.fatherId===b.fatherId&&b.motherId&&x.motherId===b.motherId)||(b.sourceHatchId&&x.sourceHatchId===b.sourceHatchId)));
+ const group=state.breeding.find(x=>x.id===b.sourceBreedingId);
+ const hatch=state.hatches.find(x=>x.id===b.sourceHatchId);
+ byId('p21Summary').innerHTML='<div class="item"><strong>'+safe(birdLabel(b.id))+'</strong>'+
+ '<small>Sire: '+safe(b.fatherId?birdLabel(b.fatherId):'Unknown')+' · Dam: '+safe(b.motherId?birdLabel(b.motherId):'Unknown')+'</small>'+
+ '<div>Hatch: '+safe(hatch?.id||'Unknown')+' · Breeding group: '+safe(group?.name||'Unknown')+'</div>'+
+ '<div>Linked siblings / hatchmates: '+(siblings.length?siblings.map(x=>safe(birdLabel(x.id))).join(', '):'None recorded')+'</div></div>'+
+ '<p class="muted">A breeding group identifies possible parents, not proven parentage. Set sire and dam separately in the parentage form below when known.</p>';
+}
+byId('p21Chick').addEventListener('change',show21);
+byId('p21Save').addEventListener('click',()=>{
+ const bird=state.birds.find(x=>x.id===byId('p21Chick').value);
+ if(!bird)return alert('Choose a registered bird first.');
+ const hatch=state.hatches.find(x=>x.id===byId('p21Hatch').value);
+ const group=state.breeding.find(x=>x.id===byId('p21Group').value);
+ if(hatch&&group&&hatch.group&&hatch.group!==group.id)return alert('That hatch is assigned to a different breeding group. Select its group or leave group unknown.');
+ bird.sourceHatchId=hatch?.id||'';
+ bird.sourceBreedingId=group?.id||hatch?.group||'';
+ save();byId('p21Chick').value=bird.id;
+ byId('p21Message').textContent='Connections saved locally. Export a fresh JSON backup.';
+ show21();
+});
+const prior=render;
+render=function(){prior();refresh21();};
+refresh21();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const get=id=>document.getElementById(id);
+const iso=()=>new Date().toLocaleDateString('en-CA');
+get('p22SaleDate').value=iso();
+const esc=safe;
+const cash=n=>'$'+Number(n||0).toFixed(2);
+function linkedSales(){return (state.sales||[]).filter(s=>s.eggCollectionId);}
+function used(id){return linkedSales().filter(s=>s.eggCollectionId===id).reduce((sum,s)=>sum+Number(s.quantity||0),0);}
+function render22(){
+ const pen=get('p22Pen'),prev=pen.value;
+ pen.innerHTML='<option value="">All pens</option>'+state.pens.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+ pen.value=state.pens.some(p=>p.id===prev)?prev:'';
+ const from=get('p22From').value,to=get('p22To').value,filter=pen.value;
+ const rows=state.eggs.filter(e=>(!from||e.date>=from)&&(!to||e.date<=to)&&(!filter||e.pen===filter));
+ const total=rows.reduce((n,e)=>n+Number(e.qty||0),0);
+ const sold=rows.reduce((n,e)=>n+used(e.id),0);
+ const income=linkedSales().filter(s=>rows.some(e=>e.id===s.eggCollectionId)).reduce((n,s)=>n+Number(s.total||0),0);
+ get('p22Summary').innerHTML=`<div class="fields"><div class="item"><strong>${total}</strong><small>Eggs collected in filter</small></div><div class="item"><strong>${sold}</strong><small>Linked eggs sold</small></div><div class="item"><strong>${Math.max(0,total-sold)}</strong><small>Not linked to sales (not guaranteed stock)</small></div><div class="item"><strong>${cash(income)}</strong><small>Revenue from linked sales</small></div></div>`+
+ rows.slice().reverse().map(e=>`<div class="item"><strong>${esc(e.date)} · ${esc(penName(e.pen))}</strong><small>Collected ${Number(e.qty)} · Linked sold ${used(e.id)} · Unlinked ${Math.max(0,Number(e.qty)-used(e.id))}</small><div>${esc(e.notes||'')}</div></div>`).join('')+
+ (rows.length?'':'<p class="muted">No collections match these filters.</p>');
+ const sel=get('p22Collection'),old=sel.value;
+ sel.innerHTML='<option value="">Choose a collection</option>'+state.eggs.map(e=>`<option value="${esc(e.id)}">${esc(e.date)} · ${esc(penName(e.pen))} · ${Math.max(0,Number(e.qty)-used(e.id))} unlinked</option>`).join('');
+ if(state.eggs.some(e=>e.id===old))sel.value=old;
+ get('p22Sales').innerHTML='<h3>Linked egg sales</h3>'+linkedSales().slice().reverse().map(s=>`<div class="item"><strong>${esc(s.date)} · ${esc(s.type)} · ${cash(s.total)}</strong><small>${Number(s.quantity)} eggs · ${esc(s.customer||'No customer recorded')}</small><div>${esc(s.notes||'')}</div></div>`).join('')+
+ (linkedSales().length?'':'<p class="muted">No linked egg sales yet.</p>');
+}
+get('p22Refresh').addEventListener('click',render22);
+get('p22SaleForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const id=get('p22Collection').value,collection=state.eggs.find(x=>x.id===id);
+ const qty=Number(get('p22Qty').value),amount=Number(get('p22Price').value);
+ if(!collection)return alert('Select a recorded egg collection.');
+ if(!Number.isSafeInteger(qty)||qty<1||!Number.isFinite(amount)||amount<0)return alert('Enter valid eggs sold and total received.');
+ const available=Number(collection.qty)-used(id);
+ if(qty>available)return alert('Only '+available+' eggs remain unlinked in this collection. Check earlier sales or select another collection.');
+ if(!confirm('Record '+qty+' eggs sold for '+cash(amount)+'? This will also add a sale to Sales and Finances.'))return;
+ state.sales ||= [];
+ state.sales.push({id:crypto.randomUUID(),date:get('p22SaleDate').value,type:get('p22Kind').value,birdId:'',eggCollectionId:id,
+ description:qty+' eggs from '+penName(collection.pen)+' ('+collection.date+')',quantity:qty,total:amount,
+ customer:get('p22Customer').value.trim(),notes:get('p22Notes').value.trim()});
+ save();
+ e.target.reset();get('p22SaleDate').value=iso();
+ get('p22Message').textContent='Linked egg sale saved locally and added to Sales and Finances. Export a JSON backup.';
+ render22();
+});
+get('p22Export').addEventListener('click',()=>{
+ const quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';
+ const lines=[['date','pen','collected','linked_sold','unlinked','notes'],...state.eggs.filter(e=>(!get('p22From').value||e.date>=get('p22From').value)&&(!get('p22To').value||e.date<=get('p22To').value)&&(!get('p22Pen').value||e.pen===get('p22Pen').value)).map(e=>[e.date,penName(e.pen),e.qty,used(e.id),Math.max(0,Number(e.qty)-used(e.id)),e.notes])];
+ const blob=new Blob([lines.map(r=>r.map(quote).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='flockvault-egg-collections.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+const oldRender=render;
+render=function(){oldRender();render22();};
+render22();
+})();
+</script><script>
+(function(){
+'use strict';
+const el23=id=>document.getElementById(id);
+const key23='flockvault-feed-low-stock-threshold';
+const saved23=Number(localStorage.getItem(key23));
+if(Number.isFinite(saved23)&&saved23>=0)el23('p23Threshold').value=String(saved23);
+function inventory23(){
+ const groups=new Map();
+ const get=(name)=>{const k=String(name||'').trim().toLowerCase();if(!k)return null;if(!groups.has(k))groups.set(k,{name:String(name).trim(),bought:0,used:0,cost:0});return groups.get(k)};
+ for(const p of state.feedPurchases||[]){const g=get(p.name);if(g){g.bought+=Number(p.pounds)||0;g.cost+=Number(p.cost)||0}}
+ for(const u of state.feedUsage||[]){const g=get(u.name);if(g)g.used+=Number(u.pounds)||0}
+ return [...groups.values()].sort((a,b)=>a.name.localeCompare(b.name));
+}
+function render23(){
+ const threshold=Math.max(0,Number(el23('p23Threshold').value)||0),filter=el23('p23Filter').value;
+ const all=inventory23(),rows=all.filter(x=>filter!=='low'||x.bought-x.used<=threshold);
+ const low=all.filter(x=>x.bought-x.used<=threshold);
+ el23('p23Notice').textContent=all.length?`${low.length} of ${all.length} feed types at or below your ${threshold} lb warning level.`:'No feed purchases or usage recorded yet.';
+ el23('p23Inventory').innerHTML=rows.map(g=>{
+  const remaining=g.bought-g.used,rate=g.bought>0?g.cost/g.bought:null;
+  return `<div class="item"><strong>${safe(g.name)} ${remaining<=threshold?'⚠️ Low stock':''}</strong><small>Purchased ${g.bought.toFixed(1)} lb · Used ${g.used.toFixed(1)} lb · Estimated remaining ${remaining.toFixed(1)} lb</small><div>Purchase spend ${dollars(g.cost)} · ${rate===null?'No purchase price available':`Average ${dollars(rate)}/lb`}${remaining<0?' · Usage exceeds recorded purchases':''}</div></div>`;
+ }).join('')||'<p class="muted">No feeds match this filter.</p>';
+ const rates=new Map(all.filter(x=>x.bought>0).map(x=>[x.name.toLowerCase(),x.cost/x.bought]));
+ el23('p23Pens').innerHTML=state.pens.map(p=>{
+  const usage=(state.feedUsage||[]).filter(u=>u.pen===p.id),lbs=usage.reduce((s,u)=>s+(Number(u.pounds)||0),0);
+  const known=usage.filter(u=>rates.has(String(u.name||'').trim().toLowerCase()));
+  const cost=known.reduce((s,u)=>s+Number(u.pounds)*rates.get(String(u.name).trim().toLowerCase()),0);
+  return `<div class="item"><strong>${safe(p.name)}</strong><small>${lbs.toFixed(1)} lb used · Estimated cost ${dollars(cost)}${known.length!==usage.length?' (some feed prices unavailable)':''}</small></div>`;
+ }).join('');
+}
+el23('p23Threshold').addEventListener('change',()=>{const v=Number(el23('p23Threshold').value);if(!Number.isFinite(v)||v<0){alert('Enter a nonnegative warning threshold.');return}localStorage.setItem(key23,String(v));render23()});
+el23('p23Filter').addEventListener('change',render23);
+el23('p23Export').addEventListener('click',()=>{
+ const threshold=Number(el23('p23Threshold').value)||0;
+ downloadCsv('flockvault-feed-inventory.csv',inventory23().map(g=>({feed:g.name,purchased_lb:g.bought.toFixed(2),used_lb:g.used.toFixed(2),estimated_remaining_lb:(g.bought-g.used).toFixed(2),purchase_spend:g.cost.toFixed(2),low_stock:g.bought-g.used<=threshold?'YES':'NO'})),['feed','purchased_lb','used_lb','estimated_remaining_lb','purchase_spend','low_stock']);
+});
+const previous=renderFeed;
+renderFeed=function(){previous();render23()};
+render23();
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const e=id=>document.getElementById(id);
+const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
+e('p24ActionDate').value=today();
+function records(){state.healthRecords ||= [];return state.healthRecords}
+function events(h){return Array.isArray(h.timeline)?h.timeline:[]}
+function closed(h){return h.caseStatus==='closed'}
+function due(h){return !closed(h)&&h.followup&&h.followup<=today()&&!h.followupCompleted}
+function label(h){return (h.scope==='pen'?penName(h.target):birdLabel(h.target))+' · '+h.date+' · '+h.category}
+function render24(){
+ const all=records(),filter=e('p24Filter').value,select=e('p24Case'),previous=select.value;
+ select.innerHTML='<option value="">Select health case</option>'+all.map(h=>'<option value="'+safe(h.id)+'">'+safe(label(h))+'</option>').join('');
+ if(all.some(h=>h.id===previous))select.value=previous;
+ e('p24Open').textContent=all.filter(h=>!closed(h)).length;
+ e('p24Due').textContent=all.filter(due).length;
+ e('p24Entries').textContent=all.reduce((n,h)=>n+events(h).length,0);
+ const shown=all.filter(h=>filter==='all'||filter==='open'&&!closed(h)||filter==='closed'&&closed(h)||filter==='due'&&due(h));
+ e('p24List').innerHTML=shown.slice().reverse().map(h=>{
+  const entries=events(h).slice().reverse().map(t=>'<div class="item"><small>'+safe(t.date)+' · '+safe(t.action)+'</small><div>'+safe(t.detail)+'</div></div>').join('');
+  const withdrawal=h.egg||h.meat?'<div class="warning">Recorded withdrawal end dates (verify with veterinarian): Eggs '+safe(h.egg||'not recorded')+' · Meat '+safe(h.meat||'not recorded')+'</div>':'';
+  return '<div class="item"><strong>'+safe(label(h))+'</strong><small>Status: '+(closed(h)?'Closed':'Open')+(due(h)?' · FOLLOW-UP DUE':'')+'</small><div>'+safe(h.symptoms)+'</div>'+withdrawal+
+   (h.followup?'<div>Follow-up: '+safe(h.followup)+(h.followupCompleted?' (completed)':'')+'</div>':'')+
+   (h.medication?'<div>Treatment recorded: '+safe(h.medication)+'</div>':'')+
+   '<div>'+entries+'</div></div>';
+ }).join('')||'<p class="muted">No health cases match this filter.</p>';
+}
+e('p24Filter').addEventListener('change',render24);
+e('p24Save').addEventListener('click',()=>{
+ const h=records().find(x=>x.id===e('p24Case').value),action=e('p24Action').value,date=e('p24ActionDate').value,detail=e('p24Detail').value.trim();
+ if(!h)return alert('Select a health case first.');
+ if(!date||!detail)return alert('Enter the update date and what happened.');
+ if(!confirm('Save this '+action+' update for '+label(h)+'?'))return;
+ h.timeline ||= [];
+ h.timeline.push({id:crypto.randomUUID(),date,action,detail});
+ if(action==='closed')h.caseStatus='closed';
+ if(action==='reopen')h.caseStatus='open';
+ if(action==='followup')h.followupCompleted=true;
+ save();
+ e('p24Case').value=h.id;
+ e('p24Detail').value='';
+ e('p24Message').textContent='Case update saved locally. Export a JSON backup to protect this history.';
+ render24();
+});
+e('p24Csv').addEventListener('click',()=>{
+ const rows=records().flatMap(h=>events(h).map(t=>({case_id:h.id,subject:label(h),date:t.date,action:t.action,detail:t.detail,status:closed(h)?'closed':'open'})));
+ downloadCsv('flockvault-treatment-history.csv',rows,['case_id','subject','date','action','detail','status']);
+});
+const old=renderHealth;
+renderHealth=function(){old();render24()};
+render24();
+})();
+</script><script>
+(function(){
+'use strict';
+const E=id=>document.getElementById(id);
+const day=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
+E('p25Date').value=day();E('p25HistoryDate').value=day();
+function render25(){
+ const old=E('p25HistoryPen').value;
+ E('p25HistoryPen').innerHTML='<option value="">All pens</option>'+state.pens.map(p=>'<option value="'+safe(p.id)+'">'+safe(p.name)+'</option>').join('');
+ E('p25HistoryPen').value=state.pens.some(p=>p.id===old)?old:'';
+ const selected=[...E('p25Pens').querySelectorAll('input:checked')].map(x=>x.value);
+ E('p25Pens').innerHTML=state.pens.map(p=>'<label style="display:inline-flex;align-items:center;gap:6px;margin:5px 14px 5px 0"><input type="checkbox" class="p25Pen" value="'+safe(p.id)+'" '+(selected.includes(p.id)?'checked':'')+'> '+safe(p.name)+'</label>').join('');
+ state.taskHistory ||= [];
+ const date=E('p25HistoryDate').value,pen=E('p25HistoryPen').value;
+ const rows=state.taskHistory.filter(h=>(!date||h.completed===date)&&(!pen||h.pen===pen));
+ E('p25History').innerHTML=rows.slice().reverse().map(h=>'<div class="item"><strong>'+safe(h.title)+'</strong><small>'+safe(h.completed)+' · '+safe(h.pen?penName(h.pen):'Farm-wide')+'</small></div>').join('')||'<p class="muted">No completed chores match this filter.</p>';
+}
+E('p25HistoryDate').addEventListener('change',render25);
+E('p25HistoryPen').addEventListener('change',render25);
+E('p25Create').addEventListener('click',()=>{
+ const pens=[...E('p25Pens').querySelectorAll('input:checked')].map(x=>x.value);
+ const chores=[['p25Feed','Feed birds'],['p25Water','Check / refill water'],['p25Clean','Clean pen / waterers'],['p25Observe','Observe birds for health concerns']].filter(x=>E(x[0]).checked).map(x=>x[1]);
+ const date=E('p25Date').value,repeat=E('p25Repeat').value;
+ if(!pens.length||!chores.length||!date)return alert('Choose a start date, at least one pen and at least one chore.');
+ state.farmTasks ||= [];
+ const proposed=pens.flatMap(pen=>chores.map(title=>({pen,title,date,repeat})));
+ const fresh=proposed.filter(t=>!state.farmTasks.some(x=>!x.done&&x.pen===t.pen&&x.title===t.title&&x.repeat===t.repeat));
+ if(!fresh.length){E('p25Status').textContent='No new chores needed: matching open chores already exist.';return}
+ if(!confirm('Create '+fresh.length+' chore(s) for '+pens.length+' selected pen(s)?'))return;
+ fresh.forEach(t=>state.farmTasks.push({...t,id:crypto.randomUUID(),notes:'Phase 25 daily checklist',done:false}));
+ save();renderCalendar();renderOperations();render25();
+ E('p25Status').textContent='Added '+fresh.length+' chore(s). '+(proposed.length-fresh.length)+' matching open chore(s) skipped.';
+});
+E('p25HistoryCsv').addEventListener('click',()=>{
+ state.taskHistory ||= [];
+ downloadCsv('flockvault-completed-chores.csv',state.taskHistory.map(h=>({completed:h.completed,scheduled:h.scheduled,title:h.title,pen:h.pen?penName(h.pen):'Farm-wide',taskId:h.taskId})),['completed','scheduled','title','pen','taskId']);
+});
+const prior=renderOperations;
+renderOperations=function(){prior();render25()};
+render25();
+})();
+</script><script>
+(function(){'use strict';
+const E=id=>document.getElementById(id),money=n=>'$'+(Number(n)||0).toFixed(2),yearOf=x=>String(x?.date||'').slice(0,4);
+const year=()=>E('p26Year').value;
+const byYear=items=>(Array.isArray(items)?items:[]).filter(x=>yearOf(x)===year());
+const sum=(items,key)=>items.reduce((n,x)=>n+(Number(x[key])||0),0);
+function render26(){
+ const sources=[state.sales,state.expenses,state.feedPurchases,state.losses];
+ const years=new Set([String(new Date().getFullYear()),'2026']);
+ for(const arr of sources)for(const x of arr||[])if(/^\d{4}$/.test(yearOf(x)))years.add(yearOf(x));
+ const select=E('p26Year'),selected=select.value||'2026';
+ select.innerHTML=[...years].sort().reverse().map(y=>'<option value="'+y+'">'+y+'</option>').join('');
+ select.value=years.has(selected)?selected:'2026';
+ const sales=byYear(state.sales),expenses=byYear(state.expenses),feed=byYear(state.feedPurchases),losses=byYear(state.losses);
+ E('p26Sales').textContent=money(sum(sales,'total'));
+ E('p26Expenses').textContent=money(sum(expenses,'amount'));
+ E('p26Difference').textContent=money(sum(sales,'total')-sum(expenses,'amount'));
+ E('p26Feed').textContent=money(sum(feed,'cost'));
+ E('p26Losses').textContent=String(losses.length);
+ E('p26LossValue').textContent=money(sum(losses,'value'));
+ const categories={};for(const x of expenses){const k=x.category||'Uncategorized';categories[k]=(categories[k]||0)+(Number(x.amount)||0)}
+ E('p26Categories').innerHTML=Object.entries(categories).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<div class="item"><strong>'+safe(k)+'</strong> · '+money(v)+'</div>').join('')||'<p class="muted">No expenses for this year.</p>';
+ const missing=expenses.filter(x=>!x.receipt).length;
+ E('p26Reconcile').innerHTML='<div class="item">'+sales.length+' sale record(s), '+expenses.length+' expense record(s), '+feed.length+' feed purchase(s), '+losses.length+' bird loss record(s).</div><div class="item">'+missing+' expense record(s) without a receipt reference.</div><div class="item">Review feed purchases against expenses for possible duplicates. Verify estimated bird values separately. Retain original receipts and supporting documents.</div>';
+}
+E('p26Year').addEventListener('change',render26);
+E('p26Print').addEventListener('click',()=>window.print());
+function exportRows(filename,items,fields){downloadCsv('flockvault-'+year()+'-'+filename+'.csv',byYear(items),fields);E('p26Status').textContent='Exported '+filename+' records for '+year()+'.'}
+E('p26SalesCsv').addEventListener('click',()=>exportRows('sales',state.sales,['date','type','birdId','description','quantity','total','customer','notes']));
+E('p26ExpenseCsv').addEventListener('click',()=>exportRows('expenses',state.expenses,['date','category','description','amount','vendor','receipt','notes']));
+E('p26FeedCsv').addEventListener('click',()=>exportRows('feed-purchases',state.feedPurchases||[],['date','name','pounds','cost','notes']));
+E('p26LossCsv').addEventListener('click',()=>exportRows('bird-losses',state.losses||[],['date','birdId','cause','value','notes']));
+const previous=render;render=function(){previous();render26()};render26();
+})();
+</script><script>
+(function(){'use strict';
+const e=id=>document.getElementById(id), now=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+e('p27Purchased').value=now();e('p27UpdateDate').value=now();
+const items=()=>{state.equipmentInventory ||= [];return state.equipmentInventory};
+const history=()=>{state.equipmentHistory ||= [];return state.equipmentHistory};
+const low=x=>x.minimum!==null&&Number(x.qty)<=Number(x.minimum);
+const due=x=>x.maintenance&&x.maintenance<=now();
+function render27(){const all=items(),f=e('p27Filter').value,previous=e('p27Select').value;
+e('p27Count').textContent=all.length;e('p27Low').textContent=all.filter(low).length;e('p27Due').textContent=all.filter(due).length;
+e('p27Select').innerHTML='<option value="">Choose item</option>'+all.map(x=>'<option value="'+safe(x.id)+'">'+safe(x.name)+'</option>').join('');if(all.some(x=>x.id===previous))e('p27Select').value=previous;
+e('p27List').innerHTML=all.filter(x=>f==='all'||f==='low'&&low(x)||f==='due'&&due(x)).map(x=>'<div class="item"><strong>'+safe(x.name)+'</strong><small>'+safe(x.category)+' · '+safe(x.qty)+' '+safe(x.unit)+' · '+safe(x.location||'Location not entered')+'</small><div>'+(low(x)?'⚠️ Low stock · ':'')+(due(x)?'🔧 Maintenance due · ':'')+'Next maintenance: '+safe(x.maintenance||'not scheduled')+'</div><div>'+safe(x.notes||'')+'</div></div>').join('')||'<p class="muted">No items match this filter.</p>';
+}
+e('p27Filter').addEventListener('change',render27);
+e('p27Form').addEventListener('submit',ev=>{ev.preventDefault();const qty=Number(e('p27Qty').value),cost=e('p27Cost').value;if(!Number.isFinite(qty)||qty<0)return alert('Enter a valid quantity.');if(!confirm('Save this inventory item?'))return;
+items().push({id:crypto.randomUUID(),name:e('p27Name').value.trim(),category:e('p27Category').value,qty,unit:e('p27Unit').value,minimum:e('p27Minimum').value===''?null:Number(e('p27Minimum').value),location:e('p27Location').value.trim(),cost:cost===''?null:Number(cost),purchased:e('p27Purchased').value,maintenance:e('p27Maintenance').value,notes:e('p27Notes').value.trim()});save();e('p27Form').reset();e('p27Qty').value='1';e('p27Purchased').value=now();render27();e('p27Status').textContent='Inventory item saved. Export a JSON backup after testing.';});
+e('p27Update').addEventListener('submit',ev=>{ev.preventDefault();const x=items().find(v=>v.id===e('p27Select').value),type=e('p27Action').value,qty=Number(e('p27Change').value);if(!x)return alert('Choose an item.');if(!Number.isFinite(qty)||qty<0)return alert('Enter a valid quantity.');if(type==='use'&&qty>x.qty)return alert('Cannot remove more than current quantity.');if(!confirm('Record '+type+' for '+x.name+'?'))return;const old=x.qty;if(type==='use')x.qty-=qty;if(type==='add')x.qty+=qty;if(e('p27Next').value)x.maintenance=e('p27Next').value;else if(type==='maintenance')x.maintenance='';history().push({id:crypto.randomUUID(),itemId:x.id,itemName:x.name,date:e('p27UpdateDate').value,type,qty:type==='use'||type==='add'?qty:0,previous:old,current:x.qty,notes:e('p27UpdateNotes').value.trim(),nextMaintenance:x.maintenance});save();render27();e('p27Select').value=x.id;e('p27UpdateNotes').value='';e('p27Next').value='';e('p27Status').textContent='Update saved.';});
+e('p27Csv').addEventListener('click',()=>downloadCsv('flockvault-equipment-inventory.csv',items(),['id','name','category','qty','unit','minimum','location','cost','purchased','maintenance','notes']));
+e('p27HistoryCsv').addEventListener('click',()=>downloadCsv('flockvault-equipment-history.csv',history(),['date','itemName','type','qty','previous','current','notes','nextMaintenance']));
+document.querySelector('[data-tab="equipment"]').addEventListener('click',render27);render27();
+})();
+</script><script>
+(function(){
+'use strict';
+const e=id=>document.getElementById(id),date=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const sum=(a,fn)=>a.reduce((n,x)=>n+(Number(fn(x))||0),0);
+function render28(){
+ const now=date(),month=now.slice(0,7),year=now.slice(0,4);
+ const health=state.healthRecords||[],tasks=state.farmTasks||[],equipment=state.equipmentInventory||[];
+ const follow=health.filter(h=>h.caseStatus!=='closed'&&!h.followupCompleted&&h.followup&&h.followup<=now);
+ const due=tasks.filter(t=>!t.done&&t.date&&t.date<=now),upcoming=tasks.filter(t=>!t.done&&t.date&&t.date>now);
+ const low=equipment.filter(x=>x.minimum!=null&&Number(x.qty)<=Number(x.minimum));
+ const maintenance=equipment.filter(x=>x.maintenance&&x.maintenance<=now);
+ const feed=sum(state.feedPurchases||[],x=>x.pounds)-sum(state.feedUsage||[],x=>x.pounds);
+ const sales=sum((state.sales||[]).filter(x=>String(x.date||'').startsWith(year)),x=>x.total);
+ const expenses=sum((state.expenses||[]).filter(x=>String(x.date||'').startsWith(year)),x=>x.amount);
+ const numbers={d28Health:health.filter(h=>h.caseStatus!=='closed').length,d28Followups:follow.length,d28Chores:due.length,d28Upcoming:upcoming.length,d28Supplies:low.length+maintenance.length,d28Feed:feed.toFixed(1),d28EggMonth:sum((state.eggs||[]).filter(x=>String(x.date||'').startsWith(month)),x=>x.qty),d28Sales:'$'+sales.toFixed(2),d28Expenses:'$'+expenses.toFixed(2)};
+ for(const [id,value] of Object.entries(numbers))e(id).textContent=value;
+ const alerts=[...follow.map(h=>'🩺 Follow-up due: '+(h.scope==='pen'?penName(h.target):birdLabel(h.target))+' ('+h.followup+')'),...due.map(t=>'📋 Chore due: '+t.title+' · '+(t.pen?penName(t.pen):'Farm-wide')+' ('+t.date+')'),...low.map(x=>'📦 Low stock: '+x.name+' ('+x.qty+' '+x.unit+')'),...maintenance.map(x=>'🔧 Service due: '+x.name+' ('+x.maintenance+')')];
+ e('d28Alerts').innerHTML=alerts.length?alerts.slice(0,20).map(x=>'<div class="item">'+safe(x)+'</div>').join('')+(alerts.length>20?'<p class="muted">Showing first 20 of '+alerts.length+' alerts.</p>':''):'<p class="muted">No overdue chores, follow-ups, or equipment alerts in the current records.</p>';
+ const hatches=state.hatches||[],pending=hatches.filter(h=>!h.actual),chicks=sum(hatches,x=>x.chicks);
+ e('d28Hatches').innerHTML='<div class="stats"><div class="stat">Hatch records<strong>'+hatches.length+'</strong></div><div class="stat">Pending hatch dates<strong>'+pending.length+'</strong></div><div class="stat">Chicks recorded<strong>'+chicks+'</strong></div><div class="stat">Completed chores today<strong>'+(state.taskHistory||[]).filter(x=>x.completed===now).length+'</strong></div></div>'+(pending.length?'<h3>Pending hatches</h3>'+pending.slice(0,8).map(h=>'<div class="item">'+safe(h.id)+' · Due '+safe(h.due||'Not recorded')+'</div>').join(''):'');
+ e('d28Updated').textContent='Snapshot updated for '+now+'. Amounts reflect recorded entries only; no automatic cloud sync.';
+}
+e('d28Refresh').addEventListener('click',render28);
+e('d28Export').addEventListener('click',()=>{render28();const ids=['penCount','birdCount','eggCount','d28Health','d28Followups','d28Chores','d28Upcoming','d28Supplies','d28Feed','d28EggMonth','d28Sales','d28Expenses'];const rows=ids.map(id=>({metric:({penCount:'Pens',birdCount:'Birds',eggCount:'Eggs today'})[id]||id.replace('d28',''),value:e(id).textContent,date:date()}));downloadCsv('flockvault-dashboard-snapshot.csv',rows,['date','metric','value']);});
+const oldSave=save;save=function(){oldSave();render28()};
+document.querySelectorAll('[data-tab="dashboard"]').forEach(b=>b.addEventListener('click',render28));
+render28();
+})();
+</script><nav class="mobile-bottom-nav" aria-label="Phone quick navigation"><button type="button" data-phone-tab="dashboard"><span>🏡</span>Home</button><button type="button" data-phone-tab="operations"><span>📋</span>Chores</button><button type="button" data-phone-tab="eggs"><span>🥚</span>Eggs</button><button type="button" data-phone-tab="health"><span>💊</span>Health</button><button type="button" data-phone-tab="backup"><span>💾</span>Backup</button></nav><script>
+(function(){
+ const buttons=[...document.querySelectorAll('[data-phone-tab]')];
+ const selector=document.getElementById('mobileSection');
+ function update(){const selected=selector&&selector.value;buttons.forEach(b=>{const active=b.dataset.phoneTab===selected;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'page':'false')})}
+ buttons.forEach(b=>b.addEventListener('click',()=>{const target=b.dataset.phoneTab;const tab=document.querySelector('.tabs [data-tab="'+target+'"]');if(tab){tab.click();if(selector)selector.value=target;update();window.scrollTo({top:0,behavior:'auto'})}}));
+ if(selector)selector.addEventListener('change',update);
+ document.querySelectorAll('.tabs [data-tab]').forEach(b=>b.addEventListener('click',update));
+ update();
+})();
+</script><script>(function(){const status=document.getElementById('p30InstallStatus'),btn=document.getElementById('p30InstallButton');let promptEvent=null;const secure=location.protocol==='https:'||location.hostname==='localhost';const standalone=window.matchMedia('(display-mode: standalone)').matches;if(standalone){status.textContent='FlockVault is running in installed app mode.';}else if(!secure){status.textContent='You are using a local file. To install FlockVault, first open it from a secure HTTPS website.';}else{status.textContent='Secure web address detected. Check your browser menu for Install app or Add to Home screen.';}window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();promptEvent=e;btn.style.display='inline-block';status.textContent='Your browser says FlockVault is ready to install.';});btn.addEventListener('click',async()=>{if(!promptEvent)return;const e=promptEvent;promptEvent=null;btn.style.display='none';await e.prompt();const choice=await e.userChoice;status.textContent=choice.outcome==='accepted'?'Installation accepted. Check your home screen.':'Installation dismissed. You can try again from your browser menu.';});window.addEventListener('appinstalled',()=>{status.textContent='FlockVault installation completed.';btn.style.display='none';});})();</script></body></html>
