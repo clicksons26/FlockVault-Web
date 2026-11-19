@@ -1434,4 +1434,30 @@ $('fv436Date').value=today();$('fv436Refresh').onclick=load;$('fv436Practice').o
 })();
 
 </script>
+
+<style id="fv437-style">
+#fv437-status{position:fixed;bottom:12px;left:12px;z-index:2147482000;max-width:min(410px,calc(100vw - 24px));box-sizing:border-box;background:#17352c;color:#fff;border:1px solid #6c9b7d;border-radius:12px;padding:9px 11px;box-shadow:0 4px 18px #0005;font:13px/1.35 system-ui,Arial,sans-serif;display:flex;align-items:center;gap:9px}
+#fv437-status button{background:#e5f4e8;color:#17352c;border:0;border-radius:7px;padding:7px 9px;font:600 12px system-ui,Arial;cursor:pointer;white-space:nowrap}
+#fv437-status .fv437-label{flex:1;min-width:0}#fv437-status.offline{background:#633c21;border-color:#d6a273}
+@media(max-width:420px){#fv437-status{left:8px;bottom:8px;max-width:calc(100vw - 16px);font-size:12px;padding:8px}#fv437-status button{padding:6px}}
+@media print{#fv437-status{display:none!important}}
+</style>
+<div id="fv437-status" role="status" aria-live="polite"><span class="fv437-label" id="fv437-label">Checking connection…</span><button type="button" id="fv437-update" title="Check for a new FlockVault app version">Check update</button><button type="button" id="fv437-dismiss" aria-label="Hide connection status">×</button></div>
+<script id="fv437-connection-updates">
+(()=>{'use strict';
+const panel=document.getElementById('fv437-status'),label=document.getElementById('fv437-label'),btn=document.getElementById('fv437-update'),dismiss=document.getElementById('fv437-dismiss');
+let dismissed=false,checking=false;
+function status(message){if(!dismissed)label.textContent=message;}
+function refresh(){const online=navigator.onLine;panel.classList.toggle('offline',!online);if(!dismissed){panel.style.display='flex';status(online?'🟢 Online · Farm records require a connection to save':'🟠 Offline · Do not save farm records until connected');}}
+window.addEventListener('online',refresh);window.addEventListener('offline',refresh);
+dismiss.addEventListener('click',()=>{dismissed=true;panel.style.display='none';});
+btn.addEventListener('click',async()=>{if(checking)return;checking=true;btn.disabled=true;status('Checking for an app update…');try{
+if(!('serviceWorker' in navigator))throw new Error('Updates require HTTPS and a supported browser.');
+const reg=await navigator.serviceWorker.getRegistration();if(!reg)throw new Error('App caching is not installed yet. Reload online, then try again.');
+await reg.update();if(reg.waiting){status('🆕 Update ready! Save your work, then tap Reload.');btn.textContent='Reload';btn.onclick=()=>window.location.reload();}
+else{status('✅ Update check finished. If a new version was published, reload after saving your work.');}
+}catch(e){status('⚠️ '+(e.message||String(e)));}finally{checking=false;btn.disabled=false;}});
+refresh();
+})();
+</script>
 </body></html>
