@@ -1,5 +1,5 @@
 /* FlockVault offline app-shell cache v1. This does NOT queue or sync farm records. */
-const CACHE = 'flockvault-shell-v1-438';
+const CACHE = 'flockvault-shell-v1-464';
 const CORE = ['./','./index.html','./manifest.webmanifest','./icons/flockvault-192.png','./icons/flockvault-512.png','./assets/founding-tribute.png','./assets/founding-roosters.png','./assets/colt-ford-dashboard.png'];
 const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.addAll(CORE);try{await cache.add(new Request(SUPABASE_CDN,{mode:'cors'}));}catch(e){console.warn('Optional CDN caching failed',e);}await self.skipWaiting();})()));
